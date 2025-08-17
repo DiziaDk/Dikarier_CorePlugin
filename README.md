@@ -45,8 +45,9 @@ price: 10000
 **Available parameters:** `mhp`, `mmp`, `atk`, `def`, `mat`, `mdf`, `agi`, `luk`, `price`.
 
 ### Skill Item Requirements
+
+In a skill's notebox, use the `<DikarierSBI>` tag:
 ```
-In a skill's notebox, use the `<DikarierSBI>` tag:```
 <DikarierSBI>
 item: 7   // Item ID
 count: 1  // Quantity (defaults to 1)
