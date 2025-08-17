@@ -6,7 +6,7 @@
 
 A core plugin for RPG Maker MZ, providing a collection of independent utilities and system enhancements to expand the engine's capabilities.
 
-[Читать на русском (Read in Russian)](README.ru.md)
+[Читать на русском (Read in Russian)](README_RU.md)
 
 ---
 
