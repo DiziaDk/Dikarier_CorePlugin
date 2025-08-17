@@ -231,19 +231,19 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  *
  * @help
  * ============================================================================
- * Введение
+ * ВВЕДЕНИЕ
  * ============================================================================
  * Dikarier Core (DCore) — это не зависимость для других плагинов, а мощный
  * сборник независимых утилит и системных улучшений для RPG Maker MZ.
  * Его цель — расширить стандартные возможности движка, предоставляя
  * разработчикам больше контроля и гибкости.
  *
- * Плагин является модульным, что позволяет легко управлять его
+ * Этот плагин является модульным, что позволяет легко управлять его
  * компонентами. В будущем он будет расширяться, добавляя еще больше
  * контроля над ядром движка.
  *
  * ============================================================================
- * Лицензия
+ * ЛИЦЕНЗИЯ
  * ============================================================================
  * Этот плагин распространяется по лицензии MIT. Это означает, что вы можете:
  * - Использовать плагин в любых проектах, включая коммерческие.
@@ -254,7 +254,17 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * с информацией об авторских правах (Copyright) в исходном коде.
  *
  * ============================================================================
- * Возможности и модули
+ * ВАЖНОЕ ЗАМЕЧАНИЕ О ЗАВИСИМОСТЯХ
+ * ============================================================================
+ * Для работы модулей "Ночная музыка (OST)" и "Таймеры (игровые дни/часы)",
+ * вашему проекту необходим другой плагин, который управляет внутриигровым
+ * временем. Этот плагин должен обновлять значение "Переменной часов" (для
+ * таймеров) и "Переключателя ночи" (для музыки).
+ *
+ * DCore сам не создает систему времени, он лишь использует ее данные.
+ *
+ * ============================================================================
+ * ВОЗМОЖНОСТИ И МОДУЛИ
  * ============================================================================
  * DCore включает в себя следующие модули:
  *
@@ -268,7 +278,7 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * - API Функции: Упрощают проверку количества предметов в инвентаре.
  *
  * ============================================================================
- * Как использовать
+ * КАК ИСПОЛЬЗОВАТЬ
  * ============================================================================
  *
  * --- Привязка клавиш ---
@@ -278,21 +288,21 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * --- Снятие лимитов характеристик ---
  * В заметках оружия или брони используйте тег <DikarierUS>:
  *
- * <DikarierUS>
- * mhp: 5000
- * atk: 999
- * price: 10000
- * </DikarierUS>
+ *   <DikarierUS>
+ *   mhp: 5000
+ *   atk: 999
+ *   price: 10000
+ *   </DikarierUS>
  *
  * Доступные параметры: mhp, mmp, atk, def, mat, mdf, agi, luk, price.
  *
  * --- Требования предметов для навыков ---
  * В заметках навыка используйте тег <DikarierSBI>:
  *
- * <DikarierSBI>
- * item: 7   // ID предмета
- * count: 1  // Количество (по умолчанию 1)
- * </DikarierSBI>
+ *   <DikarierSBI>
+ *   item: 7   // ID предмета
+ *   count: 1  // Количество (по умолчанию 1)
+ *   </DikarierSBI>
  *
  * Навык будет недоступен, если в инвентаре нет нужного количества предметов.
  * Предметы будут автоматически израсходованы после использования навыка.
@@ -300,8 +310,8 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * --- Ночная музыка (OST) ---
  * В заметках карты используйте тег <DikarierNightOST>:
  *
- * <DikarierNightOST: Town_Night>  // Устанавливает трек Town_Night
- * <DikarierNightOST: None>        // Отключает музыку ночью
+ *   <DikarierNightOST: Town_Night>  // Устанавливает трек Town_Night
+ *   <DikarierNightOST: None>        // Отключает музыку ночью
  *
  * Музыка сменится, когда переключатель, указанный в параметрах, будет включен.
  *
@@ -324,7 +334,7 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * в инвентаре 5 или больше.
  *
  * ============================================================================
- * Команды плагина
+ * КОМАНДЫ ПЛАГИНА
  * ============================================================================
  *
  * 1. Запустить таймер (локальный переключатель)
@@ -550,6 +560,16 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * notice block in the source code.
  *
  * ============================================================================
+ * Important Note on Dependencies
+ * ============================================================================
+ * For the "Night OST" and "Timers (in-game days/hours)" modules to work,
+ * your project requires another plugin that manages in-game time. This time
+ * plugin must update the value of the "Hour Variable" (for timers) and the
+ * "Night Switch" (for music) that you configure in this plugin's parameters.
+ *
+ * DCore itself does not create a time system; it only uses its data.
+ *
+ * ============================================================================
  * Features & Modules
  * ============================================================================
  * DCore includes the following modules:
@@ -568,27 +588,27 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * ============================================================================
  *
  * --- Key Bindings ---
- * Configure bindings in the plugin parameters. Each binding links a key
- * to a common event ID that will be triggered on press.
+ * Configure the bindings in the plugin parameters. Each binding consists of a
+ * key and the ID of the common event to be called on key press.
  *
  * --- Unlimit Stats ---
  * In a weapon or armor's notebox, use the <DikarierUS> tag:
  *
- * <DikarierUS>
- * mhp: 5000
- * atk: 999
- * price: 10000
- * </DikarierUS>
+ *   <DikarierUS>
+ *   mhp: 5000
+ *   atk: 999
+ *   price: 10000
+ *   </DikarierUS>
  *
  * Available parameters: mhp, mmp, atk, def, mat, mdf, agi, luk, price.
  *
  * --- Skill Item Requirements ---
  * In a skill's notebox, use the <DikarierSBI> tag:
  *
- * <DikarierSBI>
- * item: 7   // Item ID
- * count: 1  // Quantity (defaults to 1)
- * </DikarierSBI>
+ *   <DikarierSBI>
+ *   item: 7   // Item ID
+ *   count: 1  // Quantity (defaults to 1)
+ *   </DikarierSBI>
  *
  * The skill will be unusable if the party lacks the required items, which
  * will be consumed automatically upon use.
@@ -596,8 +616,8 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * --- Night OST ---
  * In a map's notebox, use the <DikarierNightOST> tag:
  *
- * <DikarierNightOST: Town_Night>  // Sets the track to Town_Night
- * <DikarierNightOST: None>        // Disables music at night
+ *   <DikarierNightOST: Town_Night>  // Sets the track to Town_Night
+ *   <DikarierNightOST: None>        // Disables music at night
  *
  * The music will change when the switch specified in the parameters is ON.
  *
