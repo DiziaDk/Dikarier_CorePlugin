@@ -1012,7 +1012,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         const oldValue = this.value(switchId);
         DCore_NightOST_Game_Switches_setValue.call(this, switchId, value);
 
-        if (switchId === Number(parameters['switchId']) && oldValue !== value && $gameMap && $dataMap) {
+        if (switchId === Number(param['switchId']) && oldValue !== value && $gameMap && $dataMap) {
             updateCurrentMapBgm();
         }
     };
@@ -1182,7 +1182,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         const currentFrame = Graphics.frameCount;
         const activeTimers = $gameSystem.activeTimers;
 
-        for (let i = $gameSystem.activeTimers.length - 1; i >= 0; i--) {
+        for (let i = activeTimers.length - 1; i >= 0; i--) {
             const timer = activeTimers[i];
 
             if (currentFrame >= timer.endTime) {
@@ -1437,7 +1437,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     };
 
     // Adds commands to the plugin manager | Добавляет команды в менеджер плагинов
-    PluginManager.registerCommand(DCorepluginName, "startSecondTimer", args => {
+    PluginManager.registerCommand(DCore.pluginName, "startSecondTimer", args => {
         const seconds = Number(args.seconds) || 60;
         const commonEventId = Number(args.commonEventId) || 1;
         $gameTimers.createSecondTimer(seconds, commonEventId);
@@ -1625,7 +1625,7 @@ DCore.weaponCount = function (id, action, count) {
     return false;
 };
 
-Dcore.armorCount = function (id, action, count) {
+DCore.armorCount = function (id, action, count) {
     if (count === undefined) {
         count = action;
         action = undefined;
