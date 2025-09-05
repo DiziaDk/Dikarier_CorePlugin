@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (c) 2024 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 //=============================================================================
 // (RU)
 //=============================================================================
-// Copyright (c) 2024 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
 //
 // Данное программное обеспечение предоставляется бесплатно любому лицу,
 // получившему копию данного программного обеспечения и сопутствующей
