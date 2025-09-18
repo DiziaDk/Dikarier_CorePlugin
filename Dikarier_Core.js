@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2024 Dizia DK (Dikarier Plugin)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 //=============================================================================
 // (RU)
 //=============================================================================
-// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2024 Dizia DK (Dikarier Plugin)
 //
 // Данное программное обеспечение предоставляется бесплатно любому лицу,
 // получившему копию данного программного обеспечения и сопутствующей
@@ -46,13 +46,13 @@
 
 var DCore = DCore || {};
 DCore.pluginName = "Dikarier_Core";
-DCore.pluginVersion = "1.0"; //For logs | Для логов
+DCore.pluginVersion = "1.1"; //For logs | Для логов
 
 /*:ru
  * @target MZ
- * @plugindesc v1.0 Dikarier Core - Сборник утилит и системных улучшений для RPG Maker MZ.
+ * @plugindesc v1.1 Dikarier Core - Сборник утилит и системных улучшений для RPG Maker MZ.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.0
+ * @version 1.1
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -158,7 +158,100 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * @type number
  * @min 1
  * @max 10
+ * 
+ * @param globalUpdate
+ * @text Глобальный апдейт Scene Map
+ * @desc Список скриптов которые будут запускатся в Scene_Map.update [Для продвинутых]
+ * 
+ * @param updteScripts
+ * @parent globalUpdate
+ * @text Апдейт главной сцены
+ * @type struct<scripts>[]
+ * @desc Однострочные скрипты для Scene_Map.update; каждая строка — отдельная.
+ * @default []
+ * 
+ * @param exitMenu
+ * @text Меню выхода
+ * @desc Настройки меню выхода на главном экране.
+ * 
+ * @param addExitMenu
+ * @parent exitMenu
+ * @text Добавить кнопку в меню
+ * @type boolean
+ * @desc Добавляет кнопку "Выход" в командное окно на титульном экране.
+ * @on Добавить
+ * @off Не добавлять
+ * @default true
+ * 
+ * @param exitWindowWidth
+ * @parent exitMenu
+ * @text Ширина окна
+ * @type number
+ * @desc Ширина окна подтверждения выхода.
+ * @default 400
+ * 
+ * @param exitWindowHeight
+ * @parent exitMenu
+ * @text Высота окна
+ * @type number
+ * @desc Высота окна подтверждения выхода.
+ * @default 150
+ * 
+ * @param exitMenuText
+ * @parent exitMenu
+ * @text Текст кнопки меню
+ * @type text
+ * @desc Текст кнопки, который будет отображаться в меню.
+ * @default Выйти
+ * 
+ * @param exitText
+ * @parent exitMenu
+ * @text Текст подтверждения
+ * @type text
+ * @desc Текст, который будет отображаться в окне подтверждения.
+ * @default Вы точно хотите выйти?
+ * 
+ * @param exitConfirm
+ * @parent exitMenu
+ * @text Текст кнопки "Подтвердить"
+ * @type text
+ * @desc Текст для кнопки подтверждения выхода.
+ * @default Да
+ * 
+ * @param exitCancel
+ * @parent exitMenu
+ * @text Текст кнопки "Отмена"
+ * @type text
+ * @desc Текст для кнопки отмены выхода.
+ * @default Нет
  *
+ * @param exitOpacity
+ * @parent exitMenu
+ * @text Прозрачность фона
+ * @type number
+ * @min 0
+ * @max 255
+ * @desc Насколько сильно будет затемнен фон сцены при выходе (0-255).
+ * @default 128
+ * 
+ * @param customError
+ * @text Пользовательские ошибки
+ * @desc Настройки для окна пользовательской ошибки.
+ * 
+ * @param errorWindowWidth
+ * @parent customError
+ * @text Ширина окна ошибки
+ * @type number
+ * @desc Ширина окна, отображающего текст ошибки.
+ * @default 400
+ * 
+ * @param errorWindowHeight
+ * @parent customError
+ * @text Высота окна ошибки
+ * @type number
+ * @desc Высота окна, отображающего текст ошибки.
+ * @default 150
+ * 
  * @command startTimer
  * @text Запустить таймер (локальный переключатель)
  * @desc Запускает таймер, который включает локальный переключатель по истечении времени.
@@ -228,6 +321,28 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * @desc ID общего события, которое будет запущено.
  * @type common_event
  * @default 1
+ * 
+ * @command triggerError
+ * @text Вызвать ошибку
+ * @desc Вызывает окно с пользовательским текстом ошибки и принудительно закрывает игру.
+ *
+ * @arg errorMessage
+ * @text Текст ошибки
+ * @type string
+ * @desc Текст, который будет показан в окне ошибки.
+ * @default Произошла критическая ошибка!
+ *
+ * @arg errorTitle
+ * @text Заголовок ошибки
+ * @type string
+ * @desc Заголовок окна ошибки.
+ * @default Ошибка
+ * 
+ * @arg buttonText
+ * @text Текст кнопки
+ * @type string
+ * @desc Текст, который будет отображаться на кнопке подтверждения.
+ * @default Понятно
  *
  * @help
  * ============================================================================
@@ -275,7 +390,10 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * - Ночная музыка (OST): Динамически меняет музыку в зависимости от времени.
  * - Таймеры: Мощная система таймеров (секунды, игровые дни и часы).
  * - Звук печати: Добавляет атмосферный звук при появлении текста в диалогах.
- * - API Функции: Упрощают проверку количества предметов в инвентаре.
+ * - Меню выхода: Добавляет настраиваемую кнопку выхода на главный экран.
+ * - Пользовательские ошибки: Позволяет вызвать окно ошибки через команду.
+ * - Глобальный апдейт: Позволяет выполнять JS-скрипты на сцене карты.
+ * - API Функции: Упрощают выполнение стандартных скриптовых вызовов.
  *
  * ============================================================================
  * КАК ИСПОЛЬЗОВАТЬ
@@ -321,6 +439,15 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * --- Звук печати ---
  * Модуль работает автоматически. Настройте звук и его параметры в
  * настройках плагина.
+ * 
+ * --- Меню Выхода ---
+ * Включите опцию "Добавить кнопку в меню" и настройте тексты и размеры окна
+ * в параметрах плагина. Кнопка появится на титульном экране.
+ *
+ * --- Глобальный апдейт (для опытных) ---
+ * В параметре "Апдейт главной сцены" добавьте JS-скрипты, которые будут
+ * выполняться каждый кадр на карте. Используйте с осторожностью, чтобы
+ * не повлиять на производительность.
  *
  * --- API Функции (для вызова в скриптах) ---
  * DCore.itemCount(id, action, count) - Проверка количества обычных предметов.
@@ -332,6 +459,10 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  *
  * Пример: DCore.itemCount(10, ">=", 5) - вернет true, если предмета с ID 10
  * в инвентаре 5 или больше.
+ *
+ * DCore.thisRegion() - Возвращает ID региона, на котором стоит игрок.
+ * DCore.membersInParty(ID) - Проверяет, есть ли актер с указанным ID в группе.
+ * DCore.changeName(ID, length) - Открывает сцену смены имени для актера.
  *
  * ============================================================================
  * КОМАНДЫ ПЛАГИНА
@@ -352,13 +483,18 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * 4. Запустить таймер игровых часов
  *    - hours: Количество игровых часов.
  *    - commonEventId: ID общего события для запуска.
+ *
+ * 5. Вызвать ошибку
+ *    - errorMessage: Текст, который будет показан в окне.
+ *    - errorTitle: Заголовок окна.
+ *    - buttonText: Текст на кнопке подтверждения.
  */
 
 /*:en
  * @target MZ
- * @plugindesc v1.0 Dikarier Core - A collection of utilities and system enhancements for RPG Maker MZ.
+ * @plugindesc v1.1 Dikarier Core - A collection of utilities and system enhancements for RPG Maker MZ.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.0
+ * @version 1.1
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -465,6 +601,99 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * @min 1
  * @max 10
  *
+ * @param globalUpdate
+ * @text Global Scene Map Update
+ * @desc List of scripts to be launched in Scene_Map.update [For advanced users]
+ * 
+ * @param updteScripts
+ * @parent globalUpdate
+ * @text Main Scene Update
+ * @type struct<scripts>[]
+ * @desc One-line scripts for Scene_Map.update; each line is separate.
+ * @default []
+ * 
+ * @param exitMenu
+ * @text Exit Menu
+ * @desc Settings for the exit menu on the main screen.
+ * 
+ * @param addExitMenu
+ * @parent exitMenu
+ * @text Add Button to Menu
+ * @type boolean
+ * @desc Adds an "Exit" button to the command window on the title screen.
+ * @on Add
+ * @off Don't Add
+ * @default true
+ * 
+ * @param exitWindowWidth
+ * @parent exitMenu
+ * @text Window Width
+ * @type number
+ * @desc The width of the exit confirmation window.
+ * @default 400
+ * 
+ * @param exitWindowHeight
+ * @parent exitMenu
+ * @text Window Height
+ * @type number
+ * @desc The height of the exit confirmation window.
+ * @default 150
+ * 
+ * @param exitMenuText
+ * @parent exitMenu
+ * @text Menu Button Text
+ * @type text
+ * @desc The text for the button that will be displayed in the menu.
+ * @default Exit
+ * 
+ * @param exitText
+ * @parent exitMenu
+ * @text Confirmation Text
+ * @type text
+ * @desc The text that will be displayed in the confirmation window.
+ * @default Are you sure you want to exit?
+ * 
+ * @param exitConfirm
+ * @parent exitMenu
+ * @text Confirm Button Text
+ * @type text
+ * @desc The text for the exit confirmation button.
+ * @default Yes
+ * 
+ * @param exitCancel
+ * @parent exitMenu
+ * @text Cancel Button Text
+ * @type text
+ * @desc The text for the exit cancellation button.
+ * @default No
+ *
+ * @param exitOpacity
+ * @parent exitMenu
+ * @text Background Opacity
+ * @type number
+ * @min 0
+ * @max 255
+ * @desc How much the scene background will be dimmed on exit (0-255).
+ * @default 128
+ * 
+ * @param customError
+ * @text Custom Errors
+ * @desc Settings for the custom error window.
+ * 
+ * @param errorWindowWidth
+ * @parent customError
+ * @text Error Window Width
+ * @type number
+ * @desc The width of the window displaying the error text.
+ * @default 400
+ * 
+ * @param errorWindowHeight
+ * @parent customError
+ * @text Error Window Height
+ * @type number
+ * @desc The height of the window displaying the error text.
+ * @default 150
+ *
  * @command startTimer
  * @text Start Timer (Local Switch)
  * @desc Starts a timer that turns on a local switch when it expires.
@@ -535,6 +764,28 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * @type common_event
  * @default 1
  *
+ * @command triggerError
+ * @text Trigger Error
+ * @desc Triggers a custom error message window and forcibly closes the game.
+ *
+ * @arg errorMessage
+ * @text Error Message
+ * @type string
+ * @desc The text that will be shown in the error window.
+ * @default A critical error has occurred!
+ *
+ * @arg errorTitle
+ * @text Error Title
+ * @type string
+ * @desc The title of the error window.
+ * @default Error
+ * 
+ * @arg buttonText
+ * @text Button Text
+ * @type string
+ * @desc The text to be displayed on the confirmation button.
+ * @default OK
+ *
  * @help
  * ============================================================================
  * Introduction
@@ -581,7 +832,10 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * - Night OST: Dynamically change music based on the time of day.
  * - Timers: A powerful timer system (seconds, game days, and game hours).
  * - Print Song: Add an atmospheric typing sound to dialogue messages.
- * - API Functions: Simplify checking item quantities in the inventory.
+ * - Exit Menu: Adds a customizable exit button to the title screen.
+ * - Custom Errors: Allows triggering an error window via a plugin command.
+ * - Global Update: Allows executing JS scripts on the map scene.
+ * - API Functions: Simplify common script calls.
  *
  * ============================================================================
  * How to Use
@@ -628,6 +882,14 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * This module works automatically. Configure the sound and its settings
  * in the plugin parameters.
  *
+ * --- Exit Menu ---
+ * Enable the "Add Button to Menu" option and customize the texts and window
+ * dimensions in the plugin parameters. The button will appear on the title screen.
+ *
+ * --- Global Update (Advanced) ---
+ * In the "Main Scene Update" parameter, add JS scripts that will be
+ * executed every frame on the map. Use with caution to avoid performance issues.
+ *
  * --- API Functions (for Script Calls) ---
  * DCore.itemCount(id, action, count) - Check quantity of regular items.
  * DCore.weaponCount(id, action, count) - Check quantity of weapons.
@@ -638,6 +900,10 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  *
  * Example: DCore.itemCount(10, ">=", 5) - returns true if the party has
  * 5 or more of the item with ID 10.
+ *
+ * DCore.thisRegion() - Returns the region ID the player is standing on.
+ * DCore.membersInParty(ID) - Checks if an actor with the specified ID is in the party.
+ * DCore.changeName(ID, length) - Opens the name change scene for an actor.
  *
  * ============================================================================
  * Plugin Commands
@@ -658,30 +924,11 @@ DCore.pluginVersion = "1.0"; //For logs | Для логов
  * 4. Start Game Hour Timer
  *    - hours: Number of in-game hours to wait.
  *    - commonEventId: ID of the common event to run.
- */
-
-/*~struct~KeyBind:ru
- * @param key
- * @text Клавиша
- * @type string
- * @desc Клавиша для привязки (например, t, T)
- *
- * @param commonEventId
- * @text ID общего события
- * @type common_event
- * @desc ID общего события для запуска
- */
-
-/*~struct~KeyBind:en
- * @param key
- * @text Key
- * @type string
- * @desc Key for binding (e.g., t, T)
- *
- * @param commonEventId
- * @text Common Event ID
- * @type common_event
- * @desc ID of the common event to run
+ * 
+ * 5. Trigger Error
+ *    - errorMessage: The text to be shown in the window.
+ *    - errorTitle: The title of the window.
+ *    - buttonText: The text on the confirmation button.
  */
 
 const param = PluginManager.parameters(DCore.pluginName);
@@ -1563,14 +1810,315 @@ const param = PluginManager.parameters(DCore.pluginName);
 })();
 
 //=============================================================================================
+// Dikarier_Core: Update | Глобальный апдейт
+//=============================================================================================
+
+(() => {
+    let scripts;
+    try{ // Script patsing | Парсинг скриптов
+        scripts = JSON.parse(param.updteScripts || '[]').map(scr => {
+            const parsed = JSON.parse(scr);
+            return{
+                script: parsed.script
+            };
+        })
+    } catch(e) {
+        console.error("Script is not a parsed");
+        scripts = [];
+    }
+
+    function DCore_runScripts(){ // This function runing all script from struct || Эта функция отвечает за запуск всех скриптов из структуры
+        for (let run of scripts) {
+            try {
+                if (run && run.script) { // Check to avoid error (left during testing, does not affect anything) || Проверка чтобы избежать ошибку (Осталась после тестирования и ни за что не отвечает)
+                    eval(run.script)
+                }
+            } catch(e) {
+                console.error("Running script error: " + e);
+            }
+            
+        }
+    }
+
+    const DCore_UpdateModify = Scene_Map.prototype.update;
+    Scene_Map.prototype.update = function() {
+        DCore_UpdateModify.call(this);
+        DCore_runScripts(); // Script starting || Запуск скрипта
+    }
+})();
+
+//=============================================================================================
+// Dikarier_Core: Exit in game menu || Меню выхода из игры
+//=============================================================================================
+
+(() => {
+    const exitButtonText = param['exitButtonText'] || "Exit";
+    const menuText = param['exitText'] || "Exit?";
+    const confirmText = param['exitConfirm'] || "Yes";
+    const cancelText = param['exitCancel'] || "No";
+    const exitOpacity = Number(param['exitOpacity'] || 128);
+    const addExitMenu = param['addExitMenu'] === 'true';
+
+    class Window_Exit extends Window_HorzCommand { //For only command window. Context window seting in scene class || Только для окна с командами. Настройки окон с контекстом находятся в классе сцены
+        initialize(rect, scene) { // Experimental || Экспериментально
+            this._scene = scene;
+            super.initialize(rect);
+        }
+        
+        makeCommandList() {
+            this.addCommand(confirmText, 'confirmExit');
+            this.addCommand(cancelText, 'cancel');
+        }
+
+        maxCols() { // For 2 button [Yes, No] || Для двух кнопок [Да, Нет]
+            return 2;
+        }
+
+        binds() { // Experimental || Экспериментально
+            this.setHandler('cancel', this._scene.cancel.bind(this._scene));
+            this.setHandler('confirmExit', this._scene.confirmExit.bind(this._scene));
+        }
+    };
+
+    class Scene_Exit extends Scene_MenuBase {
+        create() {
+            super.create();
+            this.createWindows(this);
+        }
+
+        initialize() {
+            super.initialize();
+            this._line = 36; // Default size(window.lineHeight()) || Размер по умолчанию(window.lineHeight())
+            this._drawingMainWindow = { 
+                height: param['exitMenuHeight'] || 150,
+                width: param['exitMenuWidth'] || 400
+            };
+        }
+
+        createButtons() {
+            this._buttons = []; // Placeholder to avoid creating buttons (Not used) || Заглушка чтобы не создавать кнопки(Не используется)
+        }
+
+        createBackground() { // For remove blur || Чтобы убрать размытие
+            this._backgroundSprite = new Sprite(); 
+            this._backgroundSprite.bitmap = SceneManager.backgroundBitmap();
+            this._backgroundSprite.opacity = exitOpacity; // Background opacity || Прозрачность фона
+            this.addChild(this._backgroundSprite);
+        }
+
+        update() {
+            super.update();
+            if (Input.isTriggered("cancel")) {
+                SceneManager.pop();
+            }
+        }
+
+        _alignX(text) {
+            const textWidth = this._mainWindow.textWidth(text);
+            return (this._mainWindow.contentsWidth() - textWidth) / 2;
+        }
+
+        _alignY() {
+            const textHeight = this._line;
+            return (this._mainWindow.contentsHeight() - textHeight) / 2;
+        }
+
+        getRectangle(type){
+            const mainWidth = this._drawingMainWindow.width; 
+            const mainHeight = this._drawingMainWindow.height;
+            const mainX = (Graphics.boxWidth - mainWidth) / 2;
+            const mainY = (Graphics.boxHeight - mainHeight) / 2;
+            const selectWidth = mainWidth;
+            const selectHeigth = 68; // Optimal height || Оптимальная высота
+            const selectX = mainX;
+            const selectY = mainY + mainHeight;
+
+            if (type === "main") {
+                return new Rectangle(mainX, mainY, mainWidth, mainHeight);
+            }
+            else if (type === "select") {
+                return new Rectangle(selectX, selectY, selectWidth, selectHeigth);
+            }
+        }
+
+        drawContext(window) {
+            window.drawTextEx(menuText, this._alignX(menuText), this._alignY());
+        }
+
+        createWindows(scene) {
+            const mainRect = this.getRectangle("main");
+            const selectRect = this.getRectangle("select")
+
+            this._mainWindow = new Window_Base(mainRect);
+            this._selectWindow = new Window_Exit(selectRect, this);
+            this._selectWindow.binds();
+
+            this.drawContext(this._mainWindow);
+            scene.addWindow(this._selectWindow);
+            scene.addWindow(this._mainWindow);
+        }
+
+        cancel() {
+            SceneManager.pop();
+        }
+
+        confirmExit() {
+            SceneManager.exit();
+        }
+
+        openScene() {
+            SceneManager.push(Scene_Exit);
+        }
+    };
+
+    const DCore_Exit_Window_TitleCommand_makeCommandList = Window_TitleCommand.prototype.makeCommandList;
+    Window_TitleCommand.prototype.makeCommandList = function() {
+        DCore_Exit_Window_TitleCommand_makeCommandList.call(this);
+        this.addCommand(exitButtonText, "exit");
+    };
+
+    const _Scene_Title_createCommandWindow = Scene_Title.prototype.createCommandWindow;
+    Scene_Title.prototype.createCommandWindow = function() {
+        _Scene_Title_createCommandWindow.call(this);
+        if (addExitMenu) {this._commandWindow.setHandler("exit", Scene_Exit.prototype.openScene);} //For not a static method || Для не статичных методов
+    };
+})();
+
+//=============================================================================================
+// Dikarier_Core Custom Errors || Ошибки Dikarier_Core
+//=============================================================================================
+
+(() => { 
+    PluginManager.registerCommand(DCore.pluginName, 'triggerError', args => { // Register command || Регистрация комманды
+        const erorrTitle = args.errorTitle || "Error";
+        const errorMessage = args.errorMessage || "Critical error!";
+        const buttonText = args.buttonText || "Confirm";
+
+        SceneManager.push(Scene_Error);
+        SceneManager.prepareNextScene(erorrTitle, errorMessage, buttonText);
+    });
+
+    class Window_Error extends Window_Command {
+        initialize(rect, text) {
+            this._text = text;
+            super.initialize(rect);
+        }
+
+        makeCommandList() {
+            this.addCommand(this._text, "confirm");
+        }
+    }
+
+    class Scene_Error extends Scene_MenuBase {
+        create() {
+            super.create();
+            this.createWindows(this);
+        }
+
+        initialize() {
+            super.initialize();
+            this._line = 36; // Default size(window.lineHeight()) || Размер по умолчанию(window.lineHeight())
+            this._drawingMainWindow = { 
+                height: Number(param['errorWindowHeight'] || 210),
+                width: Number(param['errorWindowWidth'] || 400)
+            };
+            console.error("Window_Error: Width: " + this._drawingMainWindow.width + "Height: " + this._drawingMainWindow.height);
+        }
+
+        prepare(erorrTitle, errorMessage, buttonText) { // Geting "prepareNextScene" parameters || Получение параметров "prepareNextScene"
+            this._errorTitle = erorrTitle;
+            this._errorMessage = errorMessage;
+            this._buttonText = buttonText;
+        }
+
+        createButtons() {
+            this._buttons = [];
+        }
+
+        update() {
+            super.update();
+            if (Input.isTriggered("cancel")) {
+                SceneManager.exit(); // 
+            }
+        }
+
+        getRectangle(type) {
+            const errorDescWindowHeight = this._drawingMainWindow.height;
+            const errorDescWindowWidth = this._drawingMainWindow.width; 
+            const errorDescX = (Graphics.boxWidth - errorDescWindowWidth) / 2;
+            const errorDescY = (Graphics.boxHeight - errorDescWindowHeight) / 2;
+            const errorConfirmHeight = 68; // Optimal height || Оптимальная высота
+            const errorConfirmWidth = errorDescWindowWidth;
+            const errorConfirmX = errorDescX;
+            const errorConfirmY = errorDescY + errorDescWindowHeight;
+            const errorTitleHeight = errorConfirmHeight; 
+            const errorTitleWidth = errorDescWindowWidth;
+            const errorTitleX = errorDescX;
+            const errorTitleY = errorDescY - errorTitleHeight;
+
+            if (type === "errorDesc") {
+                return new Rectangle(errorDescX, errorDescY, errorDescWindowWidth, errorDescWindowHeight);
+            }
+            else if (type === "errorConfirm") {
+                return new Rectangle(errorConfirmX, errorConfirmY, errorConfirmWidth, errorConfirmHeight);
+            }
+            else if (type === "errorTitle") {
+                return new Rectangle(errorTitleX, errorTitleY, errorTitleWidth, errorTitleHeight);
+            }
+        }
+
+        drawContext(window, type, text) {
+            const textWidth = window.textWidth(text); // For simplification || Для упрощения
+            const textHeight = this._line;
+            const centerX = (window.contentsWidth() - textWidth) / 2;
+            const centerY = (window.contentsHeight() - textHeight) / 2;
+
+            if (type === "desc") {
+                window.drawText(this._errorMessage, centerX, centerY, window.contentsWidth());
+            }
+            else if (type === "title") {
+                window.drawText(this._errorTitle, centerX, centerY, window.contentsWidth());
+            }
+        }
+
+        _crash() {
+            SceneManager.exit();
+        }
+
+        bindCommands(window) {
+            window.setHandler("confirm", this._crash.bind(this));
+        }
+
+        createWindows(scene) {
+            const errorDescRect = this.getRectangle("errorDesc");
+            const errorConfirmRect = this.getRectangle("errorConfirm");
+            const errorTitleRect = this.getRectangle("errorTitle");
+
+            const errorDescWindow = new Window_Base(errorDescRect);
+            const errorConfirmWindow = new Window_Error(errorConfirmRect, this._buttonText);
+            const errorTitleWindow = new Window_Base(errorTitleRect);
+
+            this.bindCommands(errorConfirmWindow);
+            this.drawContext(errorDescWindow, "desc", this._errorMessage);
+            this.drawContext(errorTitleWindow, "title", this._errorTitle);
+
+            scene.addWindow(errorTitleWindow);
+            scene.addWindow(errorDescWindow);
+            scene.addWindow(errorConfirmWindow);
+        }
+    };
+})();
+
+//=============================================================================================
 // Dikarier_Core: Mini API functions | Минимальные функции API
 //=============================================================================================
 
 // These API functions were created due to the limitations of the engine for checking items. At first, the engine 
-// could only check for the presence of items, and these functions are aimed at fixing this.
+// could only check for the presence of items, and these functions are aimed at fixing this. (Other simplify long functions)
 
 // Эти апи функции были сделаны из-за ограничения движка на проверку предметов. Изначально в движке можно проверить
-// только наличине предметов а эти функции нацелены это исправить.
+// только наличине предметов а эти функции нацелены это исправить. (Другие упрощают длинные функции)
+
 DCore.itemCount = function (id, action, count) {
     if (count === undefined) {
         count = action;
@@ -1652,15 +2200,20 @@ DCore.armorCount = function (id, action, count) {
     return false;
 };
 
-(() => {
-    const DCore_InitLog_Scene_Boot_start = Scene_Boot.prototype.start;
-    Scene_Boot.prototype.start = function() {
-        DCore_InitLog_Scene_Boot_start.call(this);
-        setTimeout(() => {
-            console.log(`${DCore.pluginName} v${DCore.pluginVersion} has been successfully loaded.`);
-        }, 100); 
-    };
-})();
+DCore.thisRegion = function() { // No argument function || Вариант функции без аргументов
+    return $gameMap.regionId($gamePlayer.x, $gamePlayer.y);
+}
+
+DCore.membersInParty = function(ID) {
+    return $gameParty.members().some(actor => actor.actorId() === ID);
+};
+
+DCore.changeName = function(ID, length) {
+    SceneManager.push(Scene_Name);
+    SceneManager.prepareNextScene(ID, length);
+};
+
+console.log(`${DCore.pluginName} v${DCore.pluginVersion} has been successfully loaded.`);
 
 //=============================================================================================
 // Dikarier_Core: End
