@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (c) 2024 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 //=============================================================================
 // (RU)
 //=============================================================================
-// Copyright (c) 2024 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
 //
 // Данное программное обеспечение предоставляется бесплатно любому лицу,
 // получившему копию данного программного обеспечения и сопутствующей
@@ -46,13 +46,13 @@
 
 var DCore = DCore || {};
 DCore.pluginName = "Dikarier_Core";
-DCore.pluginVersion = "1.1"; //For logs | Для логов
+DCore.pluginVersion = "1.2"; //For logs | Для логов
 
 /*:ru
  * @target MZ
- * @plugindesc v1.1 Dikarier Core - Сборник утилит и системных улучшений для RPG Maker MZ.
+ * @plugindesc v1.2 Dikarier Core - Ядро системы Dikarier и сборник утилит.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.1
+ * @version 1.2
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -348,14 +348,15 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  * ============================================================================
  * ВВЕДЕНИЕ
  * ============================================================================
- * Dikarier Core (DCore) — это не зависимость для других плагинов, а мощный
- * сборник независимых утилит и системных улучшений для RPG Maker MZ.
- * Его цель — расширить стандартные возможности движка, предоставляя
- * разработчикам больше контроля и гибкости.
+ * Dikarier Core (DCore) — это фундаментальная библиотека и мощный сборник
+ * независимых утилит для RPG Maker MZ.
  *
- * Этот плагин является модульным, что позволяет легко управлять его
- * компонентами. В будущем он будет расширяться, добавляя еще больше
- * контроля над ядром движка.
+ * ВАЖНО: Данный плагин является ОБЯЗАТЕЛЬНОЙ ЗАВИСИМОСТЬЮ для работы
+ * следующих плагинов:
+ * - Dikarier_NeedsSystem
+ * - Dikarier_StatisticPlugin
+ *
+ * Этот плагин должен быть установлен ВЫШЕ зависимых плагинов в менеджере.
  *
  * ============================================================================
  * ЛИЦЕНЗИЯ
@@ -369,14 +370,13 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  * с информацией об авторских правах (Copyright) в исходном коде.
  *
  * ============================================================================
- * ВАЖНОЕ ЗАМЕЧАНИЕ О ЗАВИСИМОСТЯХ
+ * ВАЖНОЕ ЗАМЕЧАНИЕ О ВРЕМЕНИ
  * ============================================================================
  * Для работы модулей "Ночная музыка (OST)" и "Таймеры (игровые дни/часы)",
- * вашему проекту необходим другой плагин, который управляет внутриигровым
+ * вашему проекту необходим любой плагин, который управляет внутриигровым
  * временем. Этот плагин должен обновлять значение "Переменной часов" (для
- * таймеров) и "Переключателя ночи" (для музыки).
- *
- * DCore сам не создает систему времени, он лишь использует ее данные.
+ * таймеров) и "Переключателя ночи" (для музыки), которые вы указываете в
+ * настройках DCore.
  *
  * ============================================================================
  * ВОЗМОЖНОСТИ И МОДУЛИ
@@ -393,7 +393,7 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  * - Меню выхода: Добавляет настраиваемую кнопку выхода на главный экран.
  * - Пользовательские ошибки: Позволяет вызвать окно ошибки через команду.
  * - Глобальный апдейт: Позволяет выполнять JS-скрипты на сцене карты.
- * - API Функции: Упрощают выполнение стандартных скриптовых вызовов.
+ * - API Функции: Библиотека функций для разработчиков и других плагинов.
  *
  * ============================================================================
  * КАК ИСПОЛЬЗОВАТЬ
@@ -446,55 +446,60 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  *
  * --- Глобальный апдейт (для опытных) ---
  * В параметре "Апдейт главной сцены" добавьте JS-скрипты, которые будут
- * выполняться каждый кадр на карте. Используйте с осторожностью, чтобы
- * не повлиять на производительность.
+ * выполняться каждый кадр на карте.
  *
  * --- API Функции (для вызова в скриптах) ---
+ * 
+ * -- Работа с предметами --
  * DCore.itemCount(id, action, count) - Проверка количества обычных предметов.
  * DCore.weaponCount(id, action, count) - Проверка количества оружия.
  * DCore.armorCount(id, action, count) - Проверка количества брони.
+ * 'action' (необязательно) - строка: "==", ">=", "<=", ">", "<". (по умолч. ">=")
+ * Пример: DCore.itemCount(10, ">=", 5)
  *
- * 'action' (необязательно) - строка для сравнения: "==", ">=", "<=", ">", "<".
- * Если 'action' не указан, используется ">=".
- *
- * Пример: DCore.itemCount(10, ">=", 5) - вернет true, если предмета с ID 10
- * в инвентаре 5 или больше.
- *
- * DCore.thisRegion() - Возвращает ID региона, на котором стоит игрок.
- * DCore.membersInParty(ID) - Проверяет, есть ли актер с указанным ID в группе.
- * DCore.changeName(ID, length) - Открывает сцену смены имени для актера.
+ * -- Утилиты --
+ * DCore.thisRegion() - Возвращает ID региона под игроком.
+ * DCore.membersInParty(ID) - Проверяет, есть ли актер с ID в группе.
+ * DCore.changeName(ID, length) - Открывает сцену смены имени.
+ * DCore.random(min, max) - Возвращает случайное целое число.
+ * DCore.randFloat(min, max) - Возвращает случайное число с плавающей точкой.
+ * DCore.persentRandom(percent) - Возвращает true с указанным шансом (0-100).
+ * 
+ * -- Работа с файлами --
+ * DCore.getData(fileName) - Асинхронная загрузка JSON из папки data (возвращает Promise).
+ * DCore.getDataSync(fileName) - Синхронная загрузка JSON (требует среды Node.js/NW.js).
  *
  * ============================================================================
  * КОМАНДЫ ПЛАГИНА
  * ============================================================================
  *
  * 1. Запустить таймер (локальный переключатель)
- *    - switchKey: Локальный переключатель (A, B, C, D), который включится.
+ *    - switchKey: Локальный переключатель (A, B, C, D).
  *    - duration: Время в секундах.
  *
  * 2. Запустить таймер в секундах (общее событие)
  *    - seconds: Время в реальных секундах.
- *    - commonEventId: ID общего события для запуска.
+ *    - commonEventId: ID общего события.
  *
  * 3. Запустить таймер игровых дней
  *    - days: Количество игровых дней.
- *    - commonEventId: ID общего события для запуска.
+ *    - commonEventId: ID общего события.
  *
  * 4. Запустить таймер игровых часов
  *    - hours: Количество игровых часов.
- *    - commonEventId: ID общего события для запуска.
+ *    - commonEventId: ID общего события.
  *
  * 5. Вызвать ошибку
- *    - errorMessage: Текст, который будет показан в окне.
- *    - errorTitle: Заголовок окна.
- *    - buttonText: Текст на кнопке подтверждения.
+ *    - errorMessage: Текст ошибки.
+ *    - errorTitle: Заголовок.
+ *    - buttonText: Текст кнопки.
  */
 
 /*:en
  * @target MZ
- * @plugindesc v1.1 Dikarier Core - A collection of utilities and system enhancements for RPG Maker MZ.
+ * @plugindesc v1.2 Dikarier Core - Core system for Dikarier and utility collection.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.1
+ * @version 1.2
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -790,14 +795,14 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  * ============================================================================
  * Introduction
  * ============================================================================
- * Dikarier Core (DCore) is not a dependency for other plugins, but rather a
- * powerful collection of independent utilities and system enhancements for
- * RPG Maker MZ. Its purpose is to extend the default engine capabilities,
- * providing developers with more control and flexibility.
+ * Dikarier Core (DCore) is the fundamental library and a powerful collection
+ * of independent utilities for RPG Maker MZ.
  *
- * This plugin is modular, allowing for easy management of its components. It
- * will be expanded in the future to offer even more control over the
- * engine's core.
+ * IMPORTANT: This plugin is a MANDATORY DEPENDENCY for the following plugins:
+ * - Dikarier_NeedsSystem
+ * - Dikarier_StatisticPlugin
+ *
+ * This plugin must be placed ABOVE the dependent plugins in the manager.
  *
  * ============================================================================
  * License
@@ -811,14 +816,12 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  * notice block in the source code.
  *
  * ============================================================================
- * Important Note on Dependencies
+ * Important Note on Time
  * ============================================================================
  * For the "Night OST" and "Timers (in-game days/hours)" modules to work,
- * your project requires another plugin that manages in-game time. This time
+ * your project requires any plugin that manages in-game time. This time
  * plugin must update the value of the "Hour Variable" (for timers) and the
- * "Night Switch" (for music) that you configure in this plugin's parameters.
- *
- * DCore itself does not create a time system; it only uses its data.
+ * "Night Switch" (for music) that you configure in DCore settings.
  *
  * ============================================================================
  * Features & Modules
@@ -835,7 +838,7 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  * - Exit Menu: Adds a customizable exit button to the title screen.
  * - Custom Errors: Allows triggering an error window via a plugin command.
  * - Global Update: Allows executing JS scripts on the map scene.
- * - API Functions: Simplify common script calls.
+ * - API Functions: A function library for developers and other plugins.
  *
  * ============================================================================
  * How to Use
@@ -888,22 +891,28 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  *
  * --- Global Update (Advanced) ---
  * In the "Main Scene Update" parameter, add JS scripts that will be
- * executed every frame on the map. Use with caution to avoid performance issues.
+ * executed every frame on the map.
  *
  * --- API Functions (for Script Calls) ---
+ * 
+ * -- Items --
  * DCore.itemCount(id, action, count) - Check quantity of regular items.
  * DCore.weaponCount(id, action, count) - Check quantity of weapons.
  * DCore.armorCount(id, action, count) - Check quantity of armors.
+ * 'action' (optional) - string: "==", ">=", "<=", ">", "<". (default: ">=")
+ * Example: DCore.itemCount(10, ">=", 5)
  *
- * 'action' (optional) - a comparison string: "==", ">=", "<=", ">", "<".
- * If 'action' is omitted, ">=" is used by default.
- *
- * Example: DCore.itemCount(10, ">=", 5) - returns true if the party has
- * 5 or more of the item with ID 10.
- *
+ * -- Utilities --
  * DCore.thisRegion() - Returns the region ID the player is standing on.
  * DCore.membersInParty(ID) - Checks if an actor with the specified ID is in the party.
  * DCore.changeName(ID, length) - Opens the name change scene for an actor.
+ * DCore.random(min, max) - Returns a random integer.
+ * DCore.randFloat(min, max) - Returns a random float number.
+ * DCore.persentRandom(percent) - Returns true based on percentage (0-100).
+ * 
+ * -- Files --
+ * DCore.getData(fileName) - Async JSON load from data folder (returns Promise).
+ * DCore.getDataSync(fileName) - Sync JSON load (Requires Node.js/NW.js env).
  *
  * ============================================================================
  * Plugin Commands
@@ -929,6 +938,44 @@ DCore.pluginVersion = "1.1"; //For logs | Для логов
  *    - errorMessage: The text to be shown in the window.
  *    - errorTitle: The title of the window.
  *    - buttonText: The text on the confirmation button.
+ */
+
+/*~struct~KeyBind:ru
+ * @param key
+ * @text Клавиша
+ * @type string
+ * @desc Клавиша для привязки (например, t, T)
+ *
+ * @param commonEventId
+ * @text ID общего события
+ * @type common_event
+ * @desc ID общего события для запуска
+ */
+
+/*~struct~KeyBind:en
+ * @param key
+ * @text Key
+ * @type string
+ * @desc Key for binding (e.g., t, T)
+ *
+ * @param commonEventId
+ * @text Common Event ID
+ * @type common_event
+ * @desc ID of the common event to run
+ */
+
+/*~struct~scripts:ru
+ * @param script
+ * @text Скрипт
+ * @type text
+ * @desc Код JavaScript для выполнения.
+ */
+
+/*~struct~scripts:en
+ * @param script
+ * @text Script
+ * @type text
+ * @desc The JavaScript code to execute.
  */
 
 const param = PluginManager.parameters(DCore.pluginName);
@@ -1486,7 +1533,8 @@ const param = PluginManager.parameters(DCore.pluginName);
                 startHour: currentHour,
                 daysElapsed: 0,
                 commonEventId: commonEventId,
-                lastCheckedHour: currentHour 
+                lastCheckedHour: currentHour,
+                _hoursTracker: 0 
             };
             return timerId;
         }
@@ -1503,7 +1551,7 @@ const param = PluginManager.parameters(DCore.pluginName);
                 startHour: currentHour,
                 hoursElapsed: 0,
                 commonEventId: commonEventId,
-                lastCheckedHour: currentHour 
+                lastCheckedHour: currentHour
             };
             return timerId;
         }
@@ -1528,15 +1576,36 @@ const param = PluginManager.parameters(DCore.pluginName);
             const completedTimers = [];
             for (const timerId in this._gameDayTimers) {
                 const timer = this._gameDayTimers[timerId];
+                
+                // Safety check for tracker existence (fixes save/load issues) | Проверка существования трекера
+                if (typeof timer._hoursTracker !== 'number') {
+                    timer._hoursTracker = 0;
+                }
 
-                if (currentGlobalHour < timer.lastCheckedHour) {
-                    timer.daysElapsed++;
-                    if (timer.daysElapsed >= timer.targetDays) {
-                        $gameTemp.reserveCommonEvent(timer.commonEventId);
-                        completedTimers.push(timerId);
-                        continue;
+                let hoursPassed = 0;
+                if (timer.lastCheckedHour !== currentGlobalHour) {
+                    if (currentGlobalHour < timer.lastCheckedHour) {
+                        hoursPassed = (24 - timer.lastCheckedHour) + currentGlobalHour;
+                    } else {
+                        hoursPassed = currentGlobalHour - timer.lastCheckedHour;
                     }
                 }
+
+                if (hoursPassed > 0) {
+                    timer._hoursTracker += hoursPassed;
+                    
+                    if (timer._hoursTracker >= 24) {
+                        const daysToAdd = Math.floor(timer._hoursTracker / 24);
+                        timer.daysElapsed += daysToAdd;
+                        timer._hoursTracker %= 24; 
+                    }
+                }
+                
+                if (timer.daysElapsed >= timer.targetDays) {
+                    $gameTemp.reserveCommonEvent(timer.commonEventId);
+                    completedTimers.push(timerId);
+                }
+
                 timer.lastCheckedHour = currentGlobalHour;
             }
             completedTimers.forEach(timerId => {
@@ -1598,7 +1667,7 @@ const param = PluginManager.parameters(DCore.pluginName);
             }
 
             if (this._lastProcessedHourForGameTimers === -1 || this._lastProcessedHourForGameTimers !== currentActualHour) {
-                if (this._lastProcessedHourForGameTimers !== currentActualHour) { 
+                if (this._lastProcessedHourForGameTimers !== currentActualHour && this._lastProcessedHourForGameTimers !== -1) { 
                     this.updateGameDayTimers(currentActualHour);
                     this.updateGameHourTimers(currentActualHour);
                 }
@@ -1637,7 +1706,8 @@ const param = PluginManager.parameters(DCore.pluginName);
         }
     }
 
-    const $gameTimers = new TimerManager();
+    window.$gameTimers = new TimerManager();
+
     const DCore_Timer_DataManager_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function() { // Resets the timers when starting a new game | Сбрасывает таймеры при новой игре
         DCore_Timer_DataManager_setupNewGame.call(this);
@@ -1830,7 +1900,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     function DCore_runScripts(){ // This function runing all script from struct || Эта функция отвечает за запуск всех скриптов из структуры
         for (let run of scripts) {
             try {
-                if (run && run.script) { // Check to avoid error (left during testing, does not affect anything) || Проверка чтобы избежать ошибку (Осталась после тестирования и ни за что не отвечает)
+                if (run && run.script && run.script.length > 0) { // Check to avoid error (left during testing, does not affect anything)(1.2 Does not start if the structure is empty) || Проверка чтобы избежать ошибку (Осталась после тестирования и ни за что не отвечает)(1.2 Не запускает если структура пуста)
                     eval(run.script)
                 }
             } catch(e) {
@@ -2200,6 +2270,24 @@ DCore.armorCount = function (id, action, count) {
     return false;
 };
 
+DCore.random = function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+DCore.randFloat = function(min, max) {
+    return Math.random() * (max - min) + min;
+};
+
+DCore.persentRandom = function(persent) {
+    if (persent >= 100) {
+        return true;
+    }
+    if (persent <= 0) {
+        return false;
+    }
+    return Math.random() * 100 < persent;
+}
+
 DCore.thisRegion = function() { // No argument function || Вариант функции без аргументов
     return $gameMap.regionId($gamePlayer.x, $gamePlayer.y);
 }
@@ -2212,6 +2300,20 @@ DCore.changeName = function(ID, length) {
     SceneManager.push(Scene_Name);
     SceneManager.prepareNextScene(ID, length);
 };
+
+DCore.getData = async function(fileName) { // For then usage || Для использования then
+    const fileUrl = "data/" + fileName + ".json";
+    const response = await fetch(fileUrl);
+    const text = await response.text();
+    return JSON.parse(text);
+}
+
+DCore.getDataSync = function(fileName) { // For no async usage || Для несинхронного использования
+    const file = require("fs");
+    const fileUrl = "data/" + fileName + ".json";
+    const text = file.readFileSync(fileUrl, "utf-8");
+    return JSON.parse(text);
+}
 
 console.log(`${DCore.pluginName} v${DCore.pluginVersion} has been successfully loaded.`);
 
