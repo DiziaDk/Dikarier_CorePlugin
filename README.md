@@ -1,10 +1,10 @@
 # Dikarier Core Plugin for RPG Maker MZ
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Author:** Dizia DK (Dikarier Plugin)  
 **License:** MIT
 
-A core plugin for RPG Maker MZ, providing a collection of independent utilities and system enhancements to expand the engine's capabilities.
+The fundamental core library for RPG Maker MZ, serving as a base for the Dikarier system and providing a collection of powerful utilities to expand the engine's capabilities.
 
 [Read in Russian (Читать на русском)](README_RU.md)
 
@@ -12,24 +12,35 @@ A core plugin for RPG Maker MZ, providing a collection of independent utilities 
 
 ## Introduction
 
-Dikarier Core (DCore) is not a dependency for other plugins, but rather a powerful collection of independent utilities and system enhancements for RPG Maker MZ. Its purpose is to extend the default engine capabilities, providing developers with more control and flexibility.
+Dikarier Core (DCore) is the **fundamental library** for the Dikarier plugin ecosystem. While it contains a powerful collection of independent utilities, its primary purpose is to serve as the foundation for other complex mechanics.
 
-This plugin is modular, allowing for easy management of its components.
+**IMPORTANT:** This plugin is a **MANDATORY DEPENDENCY** for the following plugins:
+*   `Dikarier_NeedsSystem`
+*   `Dikarier_StatisticPlugin`
+
+You must install **Dikarier Core** above these plugins in your Plugin Manager for them to function correctly.
 
 ## License
 
 This plugin is distributed under the **MIT License**. This means you are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, under the condition that the original copyright notice is included in all copies.
 
-## Requirements
+## Requirements & Compatibility
 
-For the **Night OST** and **Timers (in-game days/hours)** modules to work, your project requires another plugin that manages in-game time. This time plugin must update the value of the **Hour Variable** and the **Night Switch** that you configure in this plugin's parameters.
+### Plugin Order
+1.  **Dikarier_Core** (Place this at the top of your Dikarier plugins)
+2.  Dikarier_NeedsSystem / Dikarier_StatisticPlugin / etc.
+
+### Time System Requirement
+For the **Night OST** and **Timers (in-game days/hours)** modules to work, your project requires **any** plugin that manages in-game time. This time plugin must update the value of the **Hour Variable** and the **Night Switch** that you configure in DCore parameters.
 
 ## Installation
 
 1.  Download the `Dikarier_Core.js` file.
 2.  Place the file in your project's `js/plugins` folder.
-3.  Open your project in RPG Maker MZ, go to the Plugin Manager, and add `Dikarier_Core` to the list.
-4.  Configure the plugin parameters as needed.
+3.  Open your project in RPG Maker MZ, go to the **Plugin Manager**.
+4.  Add `Dikarier_Core` to the list.
+5.  **Ensure it is placed above dependent plugins.**
+6.  Configure the plugin parameters as needed.
 
 ## Features & Modules
 
@@ -43,7 +54,7 @@ For the **Night OST** and **Timers (in-game days/hours)** modules to work, your 
 -   **Exit Menu:** Add a customizable exit button to the title screen.
 -   **Custom Errors:** Trigger a custom error window via a plugin command.
 -   **Global Update:** Execute JS scripts on the map scene every frame.
--   **API Functions:** Use pre-made functions to simplify script calls.
+-   **API Functions:** Extensive library of functions for developers.
 
 ## How to Use
 
@@ -80,6 +91,8 @@ The music will change when the switch specified in the parameters is ON.
 Enable the "Add Button to Menu" option in the plugin parameters and customize the texts and window dimensions. The button will appear on the title screen.
 
 ### API Functions (for Script Calls)
+
+#### Items & Equipment
 -   `DCore.itemCount(id, action, count)`
 -   `DCore.weaponCount(id, action, count)`
 -   `DCore.armorCount(id, action, count)`
@@ -87,9 +100,19 @@ Enable the "Add Button to Menu" option in the plugin parameters and customize th
 The `action` (optional) is a comparison string: `"=="`, `">="`, `"<="`, `">"`, `"<"`. If omitted, `">="` is used.  
 **Example:** `DCore.itemCount(10, ">=", 5)` returns true if the party has 5 or more of item ID 10.
 
+#### Utilities
 -   `DCore.thisRegion()` - Returns the region ID the player is standing on.
 -   `DCore.membersInParty(ID)` - Checks if an actor with the specified ID is in the party.
 -   `DCore.changeName(ID, length)` - Opens the name change scene for an actor.
+
+#### Math & Probability
+-   `DCore.random(min, max)` - Returns a random integer between min and max.
+-   `DCore.randFloat(min, max)` - Returns a random float number.
+-   `DCore.persentRandom(percent)` - Returns `true` based on the specified percentage chance (0-100).
+
+#### File Handling
+-   `DCore.getData(fileName)` - Asynchronously loads a JSON file from the `data/` folder (Returns a Promise).
+-   `DCore.getDataSync(fileName)` - Synchronously loads a JSON file (Requires Node.js/NW.js environment).
 
 ## Plugin Commands
 
