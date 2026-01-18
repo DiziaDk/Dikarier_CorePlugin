@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2026 Dizia DK (Dikarier Plugin)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 //=============================================================================
 // (RU)
 //=============================================================================
-// Copyright (c) 2025 Dizia DK (Dikarier Plugin)
+// Copyright (c) 2026 Dizia DK (Dikarier Plugin)
 //
 // Данное программное обеспечение предоставляется бесплатно любому лицу,
 // получившему копию данного программного обеспечения и сопутствующей
@@ -46,13 +46,13 @@
 
 var DCore = DCore || {};
 DCore.pluginName = "Dikarier_Core";
-DCore.pluginVersion = "1.2"; //For logs | Для логов
+DCore.pluginVersion = "1.3"; //For logs | Для логов
 
 /*:ru
  * @target MZ
- * @plugindesc v1.2 Dikarier Core - Ядро системы Dikarier и сборник утилит.
+ * @plugindesc v1.3 Dikarier Core - Ядро системы Dikarier и сборник утилит.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.2
+ * @version 1.3
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -497,9 +497,9 @@ DCore.pluginVersion = "1.2"; //For logs | Для логов
 
 /*:en
  * @target MZ
- * @plugindesc v1.2 Dikarier Core - Core system for Dikarier and utility collection.
+ * @plugindesc v1.3 Dikarier Core - Core system for Dikarier and utility collection.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.2
+ * @version 1.3
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -1492,15 +1492,15 @@ const param = PluginManager.parameters(DCore.pluginName);
 // Dikarier_Core: A slightly more complex timer for common events | Чуть более сложный таймер для общих событий
 //=============================================================================================
 
-(() => { // Here the Dikarier_Timer plugin is taken as a basis, which was experimental and has a different architecture | Тут за основу используется плагин Dikarier_Timer, который являлся эксперементальным и имеет другую архитектуру
-    const hourVariableId = Number(param['hourVariable'] || 1) ;
+(() => { // (1.3) The system has been redesigned | Система была переработана
+    const hourVariableId = Number(param['hourVariable'] || 1);
 
-    class TimerManager { // Class for managing timers | Класс для управления таймерами
-        constructor() { 
-            this.reset(); 
+    class TimerManager {
+        constructor() {
+            this.reset();
         }
 
-        reset() { // Resets the timers | Сбрасывает таймеры
+        reset() {
             this._secondTimers = {};
             this._gameDayTimers = {};
             this._gameHourTimers = {};
@@ -1510,7 +1510,7 @@ const param = PluginManager.parameters(DCore.pluginName);
             this._lastProcessedHourForGameTimers = -1;
         }
 
-        createSecondTimer(seconds, commonEventId) { // Creates a timer in seconds | Создает таймер в секундах
+        createSecondTimer(seconds, commonEventId) {
             const timerId = `sec_timer_${this._nextSecondTimerId++}`;
             const endTime = Date.now() + (seconds * 1000);
             this._secondTimers[timerId] = {
@@ -1521,7 +1521,7 @@ const param = PluginManager.parameters(DCore.pluginName);
             return timerId;
         }
 
-        createGameDayTimer(days, commonEventId) { // Creates a timer for days | Создает таймер для дней
+        createGameDayTimer(days, commonEventId) {
             const timerId = `day_timer_${this._nextGameDayTimerId++}`;
             const currentHour = $gameVariables.value(hourVariableId);
 
@@ -1530,16 +1530,14 @@ const param = PluginManager.parameters(DCore.pluginName);
             }
             this._gameDayTimers[timerId] = {
                 targetDays: days,
-                startHour: currentHour,
                 daysElapsed: 0,
                 commonEventId: commonEventId,
-                lastCheckedHour: currentHour,
-                _hoursTracker: 0 
+                lastCheckedHour: currentHour
             };
             return timerId;
         }
 
-        createGameHourTimer(hours, commonEventId) { // Creates a timer for hours | Создает таймер для часов
+        createGameHourTimer(hours, commonEventId) {
             const timerId = `hour_timer_${this._nextGameHourTimerId++}`;
             const currentHour = $gameVariables.value(hourVariableId);
 
@@ -1548,7 +1546,6 @@ const param = PluginManager.parameters(DCore.pluginName);
             }
             this._gameHourTimers[timerId] = {
                 targetHours: hours,
-                startHour: currentHour,
                 hoursElapsed: 0,
                 commonEventId: commonEventId,
                 lastCheckedHour: currentHour
@@ -1556,8 +1553,7 @@ const param = PluginManager.parameters(DCore.pluginName);
             return timerId;
         }
 
-        // Updates timers | Обновление таймеров
-        updateSecondTimers() { 
+        updateSecondTimers() {
             const now = Date.now();
             const completedTimers = [];
             for (const timerId in this._secondTimers) {
@@ -1576,37 +1572,17 @@ const param = PluginManager.parameters(DCore.pluginName);
             const completedTimers = [];
             for (const timerId in this._gameDayTimers) {
                 const timer = this._gameDayTimers[timerId];
-                
-                // Safety check for tracker existence (fixes save/load issues) | Проверка существования трекера
-                if (typeof timer._hoursTracker !== 'number') {
-                    timer._hoursTracker = 0;
+
+                if (currentGlobalHour < timer.lastCheckedHour) {
+                    timer.daysElapsed++;
                 }
 
-                let hoursPassed = 0;
-                if (timer.lastCheckedHour !== currentGlobalHour) {
-                    if (currentGlobalHour < timer.lastCheckedHour) {
-                        hoursPassed = (24 - timer.lastCheckedHour) + currentGlobalHour;
-                    } else {
-                        hoursPassed = currentGlobalHour - timer.lastCheckedHour;
-                    }
-                }
+                timer.lastCheckedHour = currentGlobalHour;
 
-                if (hoursPassed > 0) {
-                    timer._hoursTracker += hoursPassed;
-                    
-                    if (timer._hoursTracker >= 24) {
-                        const daysToAdd = Math.floor(timer._hoursTracker / 24);
-                        timer.daysElapsed += daysToAdd;
-                        timer._hoursTracker %= 24; 
-                    }
-                }
-                
                 if (timer.daysElapsed >= timer.targetDays) {
                     $gameTemp.reserveCommonEvent(timer.commonEventId);
                     completedTimers.push(timerId);
                 }
-
-                timer.lastCheckedHour = currentGlobalHour;
             }
             completedTimers.forEach(timerId => {
                 delete this._gameDayTimers[timerId];
@@ -1617,65 +1593,58 @@ const param = PluginManager.parameters(DCore.pluginName);
             const completedTimers = [];
             for (const timerId in this._gameHourTimers) {
                 const timer = this._gameHourTimers[timerId];
+
                 let hoursPassed = 0;
 
-                if (timer.lastCheckedHour !== currentGlobalHour) {
-                    if (currentGlobalHour < timer.lastCheckedHour) {
-                        hoursPassed = (24 - timer.lastCheckedHour) + currentGlobalHour;
-                    } else {
-                        hoursPassed = currentGlobalHour - timer.lastCheckedHour;
-                    }
+                if (currentGlobalHour >= timer.lastCheckedHour) {
+                    hoursPassed = currentGlobalHour - timer.lastCheckedHour;
+                } else {
+                    hoursPassed = (24 - timer.lastCheckedHour) + currentGlobalHour;
                 }
 
                 if (hoursPassed > 0) {
                     timer.hoursElapsed += hoursPassed;
-                    if (timer.hoursElapsed >= timer.targetHours) {
-                        $gameTemp.reserveCommonEvent(timer.commonEventId);
-                        completedTimers.push(timerId);
-                        continue;
-                    }
+                    timer.lastCheckedHour = currentGlobalHour;
                 }
-                timer.lastCheckedHour = currentGlobalHour;
+
+                if (timer.hoursElapsed >= timer.targetHours) {
+                    $gameTemp.reserveCommonEvent(timer.commonEventId);
+                    completedTimers.push(timerId);
+                }
             }
             completedTimers.forEach(timerId => {
                 delete this._gameHourTimers[timerId];
             });
         }
 
-        // Global update for all timers | Глобальный update для всех таймеров
         update() {
             this.updateSecondTimers();
 
             const currentActualHour = $gameVariables.value(hourVariableId);
 
             if (currentActualHour < 0 || currentActualHour > 23) {
-                if (this._lastProcessedHourForGameTimers !== -2) { 
-                    this._lastProcessedHourForGameTimers = -2;
-                }
-                return; 
+                this._lastProcessedHourForGameTimers = -1;
+                return;
             }
 
-            if (this._lastProcessedHourForGameTimers === -2) { 
+            if (this._lastProcessedHourForGameTimers === -1) {
+                this._lastProcessedHourForGameTimers = currentActualHour;
                 for (const timerId in this._gameDayTimers) {
                     this._gameDayTimers[timerId].lastCheckedHour = currentActualHour;
                 }
                 for (const timerId in this._gameHourTimers) {
                     this._gameHourTimers[timerId].lastCheckedHour = currentActualHour;
                 }
-                this._lastProcessedHourForGameTimers = currentActualHour; 
                 return;
             }
 
-            if (this._lastProcessedHourForGameTimers === -1 || this._lastProcessedHourForGameTimers !== currentActualHour) {
-                if (this._lastProcessedHourForGameTimers !== currentActualHour && this._lastProcessedHourForGameTimers !== -1) { 
-                    this.updateGameDayTimers(currentActualHour);
-                    this.updateGameHourTimers(currentActualHour);
-                }
+            if (this._lastProcessedHourForGameTimers !== currentActualHour) {
+                this.updateGameDayTimers(currentActualHour);
+                this.updateGameHourTimers(currentActualHour);
                 this._lastProcessedHourForGameTimers = currentActualHour;
             }
         }
 
-        // Saving timers | Сохранение таймеров
         toSaveObject() {
             return {
                 secondTimers: this._secondTimers,
@@ -1688,7 +1657,6 @@ const param = PluginManager.parameters(DCore.pluginName);
             };
         }
 
-        // Loading timers | Загрузка таймеров
         fromSaveObject(saveObject) {
             if (saveObject) {
                 this._secondTimers = saveObject.secondTimers || {};
@@ -1699,7 +1667,7 @@ const param = PluginManager.parameters(DCore.pluginName);
                 this._nextGameHourTimerId = saveObject.nextGameHourTimerId || 1;
                 this._lastProcessedHourForGameTimers = typeof saveObject.lastProcessedHourForGameTimers === 'number'
                     ? saveObject.lastProcessedHourForGameTimers
-                    : -1; 
+                    : -1;
             } else {
                 this.reset();
             }
@@ -1709,7 +1677,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     window.$gameTimers = new TimerManager();
 
     const DCore_Timer_DataManager_setupNewGame = DataManager.setupNewGame;
-    DataManager.setupNewGame = function() { // Resets the timers when starting a new game | Сбрасывает таймеры при новой игре
+    DataManager.setupNewGame = function() {
         DCore_Timer_DataManager_setupNewGame.call(this);
         $gameTimers.reset();
         if ($gameSystem) {
@@ -1718,12 +1686,11 @@ const param = PluginManager.parameters(DCore.pluginName);
     };
 
     const DCore_Timer_Game_System_initialize = Game_System.prototype.initialize;
-    Game_System.prototype.initialize = function() { // Initializes timer data within Game_System for persistence | Инициализирует данные таймеров в Game_System для их сохранения
+    Game_System.prototype.initialize = function() {
         DCore_Timer_Game_System_initialize.call(this);
-        this._timersData = null; 
+        this._timersData = null;
     };
 
-    // Saves timer data into the save file | Сохраняет данные таймеров в файл сохранения
     const DCore_Timer_DataManager_makeSaveContents = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function() {
         const contents = DCore_Timer_DataManager_makeSaveContents.call(this);
@@ -1733,27 +1700,24 @@ const param = PluginManager.parameters(DCore.pluginName);
         return contents;
     };
 
-    // Loads timer data from the save file | Загружает данные таймеров из файла сохранения
     const DCore_Timer_DataManager_extractSaveContents = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function(contents) {
         DCore_Timer_DataManager_extractSaveContents.call(this, contents);
-        if ($gameSystem) { 
+        if ($gameSystem) {
             $gameTimers.fromSaveObject($gameSystem._timersData);
         } else {
             $gameTimers.reset();
         }
     };
 
-    // Adds global update to Scene_Map | Добавляет глобальный апдейт таймеров в глобальный апдейт сцены Scene_Map
     const DCore_Timer_Scene_Map_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
         DCore_Timer_Scene_Map_update.call(this);
-        if ($gameTimers) { 
+        if ($gameTimers) {
             $gameTimers.update();
         }
     };
 
-    // Adds commands to the plugin manager | Добавляет команды в менеджер плагинов
     PluginManager.registerCommand(DCore.pluginName, "startSecondTimer", args => {
         const seconds = Number(args.seconds) || 60;
         const commonEventId = Number(args.commonEventId) || 1;
@@ -1918,7 +1882,7 @@ const param = PluginManager.parameters(DCore.pluginName);
 })();
 
 //=============================================================================================
-// Dikarier_Core: Exit in game menu || Меню выхода из игры
+// Dikarier_Core: Exit in game menu | Меню выхода из игры
 //=============================================================================================
 
 (() => {
@@ -2055,7 +2019,7 @@ const param = PluginManager.parameters(DCore.pluginName);
 })();
 
 //=============================================================================================
-// Dikarier_Core Custom Errors || Ошибки Dikarier_Core
+// Dikarier_Core Custom Errors | Ошибки Dikarier_Core
 //=============================================================================================
 
 (() => { 
@@ -2308,7 +2272,7 @@ DCore.getData = async function(fileName) { // For then usage || Для испо�
     return JSON.parse(text);
 }
 
-DCore.getDataSync = function(fileName) { // For no async usage || Для несинхронного использования
+DCore.getDataSync = function(fileName) { // For no async usage (Not work in browser) || Для несинхронного использования (Не работает в браузере)
     const file = require("fs");
     const fileUrl = "data/" + fileName + ".json";
     const text = file.readFileSync(fileUrl, "utf-8");
