@@ -1,6 +1,6 @@
 # Dikarier Core Plugin for RPG Maker MZ
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Author:** Dizia DK (Dikarier Plugin)  
 **License:** MIT
 
