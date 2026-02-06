@@ -46,13 +46,13 @@
 
 var DCore = DCore || {};
 DCore.pluginName = "Dikarier_Core";
-DCore.pluginVersion = "1.3"; //For logs | Для логов
+DCore.pluginVersion = "1.4"; //For logs | Для логов
 
 /*:ru
  * @target MZ
- * @plugindesc v1.3 Dikarier Core - Ядро системы Dikarier и сборник утилит.
+ * @plugindesc v1.4 Dikarier Core - Ядро системы Dikarier и сборник утилит.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.3
+ * @version 1.4
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -158,22 +158,22 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @type number
  * @min 1
  * @max 10
- * 
+ *
  * @param globalUpdate
  * @text Глобальный апдейт Scene Map
  * @desc Список скриптов которые будут запускатся в Scene_Map.update [Для продвинутых]
- * 
+ *
  * @param updteScripts
  * @parent globalUpdate
  * @text Апдейт главной сцены
  * @type struct<scripts>[]
  * @desc Однострочные скрипты для Scene_Map.update; каждая строка — отдельная.
  * @default []
- * 
+ *
  * @param exitMenu
  * @text Меню выхода
  * @desc Настройки меню выхода на главном экране.
- * 
+ *
  * @param addExitMenu
  * @parent exitMenu
  * @text Добавить кнопку в меню
@@ -182,42 +182,42 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @on Добавить
  * @off Не добавлять
  * @default true
- * 
+ *
  * @param exitWindowWidth
  * @parent exitMenu
  * @text Ширина окна
  * @type number
  * @desc Ширина окна подтверждения выхода.
  * @default 400
- * 
+ *
  * @param exitWindowHeight
  * @parent exitMenu
  * @text Высота окна
  * @type number
  * @desc Высота окна подтверждения выхода.
  * @default 150
- * 
+ *
  * @param exitMenuText
  * @parent exitMenu
  * @text Текст кнопки меню
  * @type text
  * @desc Текст кнопки, который будет отображаться в меню.
  * @default Выйти
- * 
+ *
  * @param exitText
  * @parent exitMenu
  * @text Текст подтверждения
  * @type text
  * @desc Текст, который будет отображаться в окне подтверждения.
  * @default Вы точно хотите выйти?
- * 
+ *
  * @param exitConfirm
  * @parent exitMenu
  * @text Текст кнопки "Подтвердить"
  * @type text
  * @desc Текст для кнопки подтверждения выхода.
  * @default Да
- * 
+ *
  * @param exitCancel
  * @parent exitMenu
  * @text Текст кнопки "Отмена"
@@ -233,25 +233,25 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @max 255
  * @desc Насколько сильно будет затемнен фон сцены при выходе (0-255).
  * @default 128
- * 
+ *
  * @param customError
  * @text Пользовательские ошибки
  * @desc Настройки для окна пользовательской ошибки.
- * 
+ *
  * @param errorWindowWidth
  * @parent customError
  * @text Ширина окна ошибки
  * @type number
  * @desc Ширина окна, отображающего текст ошибки.
  * @default 400
- * 
+ *
  * @param errorWindowHeight
  * @parent customError
  * @text Высота окна ошибки
  * @type number
  * @desc Высота окна, отображающего текст ошибки.
  * @default 150
- * 
+ *
  * @command startTimer
  * @text Запустить таймер (локальный переключатель)
  * @desc Запускает таймер, который включает локальный переключатель по истечении времени.
@@ -321,7 +321,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @desc ID общего события, которое будет запущено.
  * @type common_event
  * @default 1
- * 
+ *
  * @command triggerError
  * @text Вызвать ошибку
  * @desc Вызывает окно с пользовательским текстом ошибки и принудительно закрывает игру.
@@ -337,7 +337,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @type string
  * @desc Заголовок окна ошибки.
  * @default Ошибка
- * 
+ *
  * @arg buttonText
  * @text Текст кнопки
  * @type string
@@ -439,7 +439,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * --- Звук печати ---
  * Модуль работает автоматически. Настройте звук и его параметры в
  * настройках плагина.
- * 
+ *
  * --- Меню Выхода ---
  * Включите опцию "Добавить кнопку в меню" и настройте тексты и размеры окна
  * в параметрах плагина. Кнопка появится на титульном экране.
@@ -449,7 +449,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * выполняться каждый кадр на карте.
  *
  * --- API Функции (для вызова в скриптах) ---
- * 
+ *
  * -- Работа с предметами --
  * DCore.itemCount(id, action, count) - Проверка количества обычных предметов.
  * DCore.weaponCount(id, action, count) - Проверка количества оружия.
@@ -464,7 +464,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * DCore.random(min, max) - Возвращает случайное целое число.
  * DCore.randFloat(min, max) - Возвращает случайное число с плавающей точкой.
  * DCore.persentRandom(percent) - Возвращает true с указанным шансом (0-100).
- * 
+ *
  * -- Работа с файлами --
  * DCore.getData(fileName) - Асинхронная загрузка JSON из папки data (возвращает Promise).
  * DCore.getDataSync(fileName) - Синхронная загрузка JSON (требует среды Node.js/NW.js).
@@ -497,9 +497,9 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
 
 /*:en
  * @target MZ
- * @plugindesc v1.3 Dikarier Core - Core system for Dikarier and utility collection.
+ * @plugindesc v1.4 Dikarier Core - Core system for Dikarier and utility collection.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.3
+ * @version 1.4
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -609,18 +609,18 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @param globalUpdate
  * @text Global Scene Map Update
  * @desc List of scripts to be launched in Scene_Map.update [For advanced users]
- * 
+ *
  * @param updteScripts
  * @parent globalUpdate
  * @text Main Scene Update
  * @type struct<scripts>[]
  * @desc One-line scripts for Scene_Map.update; each line is separate.
  * @default []
- * 
+ *
  * @param exitMenu
  * @text Exit Menu
  * @desc Settings for the exit menu on the main screen.
- * 
+ *
  * @param addExitMenu
  * @parent exitMenu
  * @text Add Button to Menu
@@ -629,42 +629,42 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @on Add
  * @off Don't Add
  * @default true
- * 
+ *
  * @param exitWindowWidth
  * @parent exitMenu
  * @text Window Width
  * @type number
  * @desc The width of the exit confirmation window.
  * @default 400
- * 
+ *
  * @param exitWindowHeight
  * @parent exitMenu
  * @text Window Height
  * @type number
  * @desc The height of the exit confirmation window.
  * @default 150
- * 
+ *
  * @param exitMenuText
  * @parent exitMenu
  * @text Menu Button Text
  * @type text
  * @desc The text for the button that will be displayed in the menu.
  * @default Exit
- * 
+ *
  * @param exitText
  * @parent exitMenu
  * @text Confirmation Text
  * @type text
  * @desc The text that will be displayed in the confirmation window.
  * @default Are you sure you want to exit?
- * 
+ *
  * @param exitConfirm
  * @parent exitMenu
  * @text Confirm Button Text
  * @type text
  * @desc The text for the exit confirmation button.
  * @default Yes
- * 
+ *
  * @param exitCancel
  * @parent exitMenu
  * @text Cancel Button Text
@@ -680,18 +680,18 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @max 255
  * @desc How much the scene background will be dimmed on exit (0-255).
  * @default 128
- * 
+ *
  * @param customError
  * @text Custom Errors
  * @desc Settings for the custom error window.
- * 
+ *
  * @param errorWindowWidth
  * @parent customError
  * @text Error Window Width
  * @type number
  * @desc The width of the window displaying the error text.
  * @default 400
- * 
+ *
  * @param errorWindowHeight
  * @parent customError
  * @text Error Window Height
@@ -784,7 +784,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * @type string
  * @desc The title of the error window.
  * @default Error
- * 
+ *
  * @arg buttonText
  * @text Button Text
  * @type string
@@ -894,7 +894,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * executed every frame on the map.
  *
  * --- API Functions (for Script Calls) ---
- * 
+ *
  * -- Items --
  * DCore.itemCount(id, action, count) - Check quantity of regular items.
  * DCore.weaponCount(id, action, count) - Check quantity of weapons.
@@ -909,7 +909,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * DCore.random(min, max) - Returns a random integer.
  * DCore.randFloat(min, max) - Returns a random float number.
  * DCore.persentRandom(percent) - Returns true based on percentage (0-100).
- * 
+ *
  * -- Files --
  * DCore.getData(fileName) - Async JSON load from data folder (returns Promise).
  * DCore.getDataSync(fileName) - Sync JSON load (Requires Node.js/NW.js env).
@@ -933,7 +933,7 @@ DCore.pluginVersion = "1.3"; //For logs | Для логов
  * 4. Start Game Hour Timer
  *    - hours: Number of in-game hours to wait.
  *    - commonEventId: ID of the common event to run.
- * 
+ *
  * 5. Trigger Error
  *    - errorMessage: The text to be shown in the window.
  *    - errorTitle: The title of the window.
@@ -1009,7 +1009,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     }
 
     // Extends the map update loop to check for hotkeys | Расширяет цикл обновления карты для проверки горячих клавиш
-    const DCoreBind_Scene_Map_updateScene = Scene_Map.prototype.updateScene; 
+    const DCoreBind_Scene_Map_updateScene = Scene_Map.prototype.updateScene;
     Scene_Map.prototype.updateScene = function() {
         DCoreBind_Scene_Map_updateScene.call(this);
         if (!SceneManager.isSceneChanging()) {
@@ -1034,34 +1034,34 @@ const param = PluginManager.parameters(DCore.pluginName);
 // Dikarier_Core: Unlimit Item/Equipment Stats | Снятие лимитов характеристик
 //=============================================================================================
 
-(() => {    
+(() => {
     // Parses the <DikarierUS> notetag from an item to extract custom stats | Парсит тег <DikarierUS> из предмета для извлечения кастомных характеристик
-    function processNoteTags(item) { 
+    function processNoteTags(item) {
         if (!item || !item.note) return;
-        
+
         const regex = /<DikarierUS>([\s\S]*?)<\/DikarierUS>/i;
         const match = item.note.match(regex);
-        
+
         if (match) {
             const content = match[1].trim();
             const lines = content.split('\n');
-            
+
             for (const line of lines) {
                 const parts = line.split(':');
                 if (parts.length >= 2) {
                     const key = parts[0].trim().toLowerCase();
                     const value = Number(parts.slice(1).join(':').trim());
-                    
+
                     applyParameterValue(item, key, value);
                 }
             }
         }
     }
-    
+
     // Applies a single parsed stat (key-value pair) to the item object | Применяет одну распарсенную характеристику (ключ-значение) к объекту предмета
     function applyParameterValue(item, key, value) {
         if (isNaN(value)) return;
-        
+
         switch (key) {
             case 'mhp':
                 item.params[0] = value;
@@ -1092,23 +1092,23 @@ const param = PluginManager.parameters(DCore.pluginName);
                 break;
         }
     }
-    
+
     // Scans all weapons and armor after the database loads to apply custom stats from notetags | Сканирует всё оружие и броню после загрузки базы данных для применения кастомных характеристик из заметок
     const DCore_UnlimitStats_DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
     DataManager.isDatabaseLoaded = function() {
         if (!DCore_UnlimitStats_DataManager_isDatabaseLoaded.call(this)) return false;
-        
+
         for (const weapon of $dataWeapons) {
             if (weapon) processNoteTags(weapon);
         }
-        
+
         for (const armor of $dataArmors) {
             if (armor) processNoteTags(armor);
         }
-        
+
         return true;
     };
-    
+
     // Overrides the default price calculation to ensure the custom price from the notetag is used | Переопределяет стандартный расчет цены, чтобы использовалась кастомная цена из заметок
     const DCore_UnlimitStats_Game_Item_prototype_price = Game_Item.prototype.price;
     Game_Item.prototype.price = function() {
@@ -1126,27 +1126,27 @@ const param = PluginManager.parameters(DCore.pluginName);
 
 (() => {
     const skillItemRequirements = {};
-    
+
     // Parses skill notetags to find item requirements | Парсит заметки навыков для поиска требуемых предметов
     function processSkillNoteTags() {
         for (const skill of $dataSkills) {
             if (!skill || !skill.note) continue;
-            
+
             const regex = /<DikarierSBI>([\s\S]*?)<\/DikarierSBI>/i;
             const match = skill.note.match(regex);
-            
+
             if (match) {
                 const content = match[1].trim();
                 const lines = content.split('\n');
                 let itemId = 0;
-                let itemCount = 1; 
-                
+                let itemCount = 1;
+
                 for (const line of lines) {
                     const parts = line.split(':');
                     if (parts.length >= 2) {
                         const key = parts[0].trim().toLowerCase();
                         const value = Number(parts.slice(1).join(':').trim());
-                        
+
                         if (key === 'item' && !isNaN(value)) {
                             itemId = value;
                         } else if (key === 'count' && !isNaN(value)) {
@@ -1154,7 +1154,7 @@ const param = PluginManager.parameters(DCore.pluginName);
                         }
                     }
                 }
-                
+
                 if (itemId > 0) {
                     skillItemRequirements[skill.id] = {
                         itemId: itemId,
@@ -1164,53 +1164,53 @@ const param = PluginManager.parameters(DCore.pluginName);
             }
         }
     }
-    
+
     // Scans all skills after the database loads to process their requirements | Сканирует все навыки после загрузки базы данных для обработки их требований
     const DCore_SkillBlock_DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
     DataManager.isDatabaseLoaded = function() {
         if (!DCore_SkillBlock_DataManager_isDatabaseLoaded.call(this)) return false;
-        
+
         if (!skillItemRequirementsLoaded) {
             processSkillNoteTags();
             skillItemRequirementsLoaded = true;
         }
-        
+
         return true;
     };
-    
+
     let skillItemRequirementsLoaded = false;
-    
+
     // Adds a check for required items before a skill can be used | Добавляет проверку на наличие требуемых предметов перед использованием навыка
     const DCore_SkillBlock_Game_BattlerBase_meetsSkillConditions = Game_BattlerBase.prototype.meetsSkillConditions;
     Game_BattlerBase.prototype.meetsSkillConditions = function(skill) {
         const basicConditionsMet = DCore_SkillBlock_Game_BattlerBase_meetsSkillConditions.call(this, skill);
         if (!basicConditionsMet) return false;
-        
+
         if (skillItemRequirements[skill.id]) {
             const requirement = skillItemRequirements[skill.id];
             const hasItems = this.hasRequiredItems(requirement.itemId, requirement.count);
             return hasItems;
         }
-        
+
         return true;
     };
-    
+
     // Checks if the party possesses the required amount of an item | Проверяет, есть ли у партии необходимое количество предмета
     Game_BattlerBase.prototype.hasRequiredItems = function(itemId, count) {
         if (this.isActor()) {
             return $gameParty.numItems($dataItems[itemId]) >= count;
         }
-        return true; 
+        return true;
     };
-    
+
     // Consumes the required items from inventory after the skill is used | Расходует требуемые предметы из инвентаря после использования навыка
     const DCore_SkillBlock_Game_Battler_useItem = Game_Battler.prototype.useItem;
     Game_Battler.prototype.useItem = function(item) {
         DCore_SkillBlock_Game_Battler_useItem.call(this, item);
-        
+
         if (DataManager.isSkill(item) && skillItemRequirements[item.id]) {
             const requirement = skillItemRequirements[item.id];
-            
+
             if (this.isActor()) {
                 const actualItem = $dataItems[requirement.itemId];
                 $gameParty.loseItem(actualItem, requirement.count);
@@ -1228,17 +1228,17 @@ const param = PluginManager.parameters(DCore.pluginName);
     const DCore_AutoFullscreen_Scene_Boot_start = Scene_Boot.prototype.start;
     Scene_Boot.prototype.start = function() {
         DCore_AutoFullscreen_Scene_Boot_start.call(this);
-        
+
         setTimeout(() => {
             Graphics._requestFullScreen();
         }, 100);
     };
-    
+
     // Ensures the game is in fullscreen when the title screen appears (as a fallback) | Гарантирует, что игра в полноэкранном режиме при появлении титульного экрана (как резервная проверка
     const DCore_AutoFullscreen_Scene_Title_create = Scene_Title.prototype.create;
     Scene_Title.prototype.create = function() {
         DCore_AutoFullscreen_Scene_Title_create.call(this);
-        
+
         if (!Graphics._isFullScreen()) {
             Graphics._requestFullScreen();
         }
@@ -1252,7 +1252,7 @@ const param = PluginManager.parameters(DCore.pluginName);
 (() => {
     const switchId = Number(param['switchId'] || 1);
     const fadeTime = Number(param['fadeTime'] || 2);
-    
+
     let currentNightBgm = null;
 
     // Overrides default BGM playback to play night BGM if conditions are met | Переопределяет стандартное воспроизведение BGM для проигрывания ночной музыки, если условия соблюдены
@@ -1318,7 +1318,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         if ($gameSwitches.value(switchId) && nightBgm !== null) {
             if (nightBgm === "None") {
                 if (currentNightBgm === "None") {
-                    return; 
+                    return;
                 }
 
                 AudioManager.fadeOutBgm(fadeTime);
@@ -1451,12 +1451,12 @@ const param = PluginManager.parameters(DCore.pluginName);
 
     // Plugin command for starting a timer | Команда плагина для запуска таймера
     PluginManager.registerCommand(DCore.pluginName, "startTimer", function (args) {
-        if (!this._eventId) return; 
+        if (!this._eventId) return;
 
         const mapId = $gameMap.mapId();
         const eventId = this._eventId;
         const switchKey = args.switchKey.toUpperCase();
-        const duration = Number(args.duration) * 60; 
+        const duration = Number(args.duration) * 60;
 
         if (!["A", "B", "C", "D"].includes(switchKey)) return;
 
@@ -1870,7 +1870,7 @@ const param = PluginManager.parameters(DCore.pluginName);
             } catch(e) {
                 console.error("Running script error: " + e);
             }
-            
+
         }
     }
 
@@ -1898,7 +1898,7 @@ const param = PluginManager.parameters(DCore.pluginName);
             this._scene = scene;
             super.initialize(rect);
         }
-        
+
         makeCommandList() {
             this.addCommand(confirmText, 'confirmExit');
             this.addCommand(cancelText, 'cancel');
@@ -1923,7 +1923,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         initialize() {
             super.initialize();
             this._line = 36; // Default size(window.lineHeight()) || Размер по умолчанию(window.lineHeight())
-            this._drawingMainWindow = { 
+            this._drawingMainWindow = {
                 height: param['exitMenuHeight'] || 150,
                 width: param['exitMenuWidth'] || 400
             };
@@ -1934,7 +1934,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         }
 
         createBackground() { // For remove blur || Чтобы убрать размытие
-            this._backgroundSprite = new Sprite(); 
+            this._backgroundSprite = new Sprite();
             this._backgroundSprite.bitmap = SceneManager.backgroundBitmap();
             this._backgroundSprite.opacity = exitOpacity; // Background opacity || Прозрачность фона
             this.addChild(this._backgroundSprite);
@@ -1958,7 +1958,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         }
 
         getRectangle(type){
-            const mainWidth = this._drawingMainWindow.width; 
+            const mainWidth = this._drawingMainWindow.width;
             const mainHeight = this._drawingMainWindow.height;
             const mainX = (Graphics.boxWidth - mainWidth) / 2;
             const mainY = (Graphics.boxHeight - mainHeight) / 2;
@@ -2022,7 +2022,7 @@ const param = PluginManager.parameters(DCore.pluginName);
 // Dikarier_Core Custom Errors | Ошибки Dikarier_Core
 //=============================================================================================
 
-(() => { 
+(() => {
     PluginManager.registerCommand(DCore.pluginName, 'triggerError', args => { // Register command || Регистрация комманды
         const erorrTitle = args.errorTitle || "Error";
         const errorMessage = args.errorMessage || "Critical error!";
@@ -2052,7 +2052,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         initialize() {
             super.initialize();
             this._line = 36; // Default size(window.lineHeight()) || Размер по умолчанию(window.lineHeight())
-            this._drawingMainWindow = { 
+            this._drawingMainWindow = {
                 height: Number(param['errorWindowHeight'] || 210),
                 width: Number(param['errorWindowWidth'] || 400)
             };
@@ -2072,20 +2072,20 @@ const param = PluginManager.parameters(DCore.pluginName);
         update() {
             super.update();
             if (Input.isTriggered("cancel")) {
-                SceneManager.exit(); // 
+                SceneManager.exit(); //
             }
         }
 
         getRectangle(type) {
             const errorDescWindowHeight = this._drawingMainWindow.height;
-            const errorDescWindowWidth = this._drawingMainWindow.width; 
+            const errorDescWindowWidth = this._drawingMainWindow.width;
             const errorDescX = (Graphics.boxWidth - errorDescWindowWidth) / 2;
             const errorDescY = (Graphics.boxHeight - errorDescWindowHeight) / 2;
             const errorConfirmHeight = 68; // Optimal height || Оптимальная высота
             const errorConfirmWidth = errorDescWindowWidth;
             const errorConfirmX = errorDescX;
             const errorConfirmY = errorDescY + errorDescWindowHeight;
-            const errorTitleHeight = errorConfirmHeight; 
+            const errorTitleHeight = errorConfirmHeight;
             const errorTitleWidth = errorDescWindowWidth;
             const errorTitleX = errorDescX;
             const errorTitleY = errorDescY - errorTitleHeight;
@@ -2147,7 +2147,7 @@ const param = PluginManager.parameters(DCore.pluginName);
 // Dikarier_Core: Mini API functions | Минимальные функции API
 //=============================================================================================
 
-// These API functions were created due to the limitations of the engine for checking items. At first, the engine 
+// These API functions were created due to the limitations of the engine for checking items. At first, the engine
 // could only check for the presence of items, and these functions are aimed at fixing this. (Other simplify long functions)
 
 // Эти апи функции были сделаны из-за ограничения движка на проверку предметов. Изначально в движке можно проверить
@@ -2277,6 +2277,39 @@ DCore.getDataSync = function(fileName) { // For no async usage (Not work in brow
     const fileUrl = "data/" + fileName + ".json";
     const text = file.readFileSync(fileUrl, "utf-8");
     return JSON.parse(text);
+}
+
+//=============================================================================================
+// Dikarier_Core: Engine Enhancements | Улучшения движка
+//=============================================================================================
+
+Window_Base.prototype.drawImage = function(fileName, x, y, width, height) {
+    const bitmap = ImageManager.loadPicture(fileName);
+    bitmap.addLoadListener(() => {
+        this.contents.blt(
+            bitmap,
+            0,
+            0,
+            bitmap.width,
+            bitmap.height,
+            x,
+            y,
+            width || bitmap.width,
+            height || bitmap.height,
+        );
+    })
+}
+
+const _DCore_GameActor_changeEquip = Game_Actor.prototype.changeEquip;
+Game_Actor.prototype.changeEquip = function(slotId, item) {
+    const oldEquip = this.equips()[slotId];
+    _DCore_GameActor_changeEquip.call(this, slotId, item);
+    if (oldEquip && oldEquip.onUnequip) {
+        oldEquip.onUnequip(this);
+    }
+    if (item && item.onEquip) {
+        item.onEquip(this);
+    }
 }
 
 console.log(`${DCore.pluginName} v${DCore.pluginVersion} has been successfully loaded.`);
