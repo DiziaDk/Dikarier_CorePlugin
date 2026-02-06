@@ -1,6 +1,6 @@
 # Dikarier Core Plugin для RPG Maker MZ
 
-**Версия:** 1.3
+**Версия:** 1.4
 **Автор:** Dizia DK (Dikarier Plugin)  
 **Лицензия:** MIT
 
@@ -113,6 +113,10 @@ count: 1  // Количество (по умолчанию 1)
 #### Работа с файлами
 -   `DCore.getData(fileName)` — Асинхронная загрузка JSON из папки `data/` (возвращает Promise).
 -   `DCore.getDataSync(fileName)` — Синхронная загрузка JSON (требует среду Node.js/NW.js).
+
+#### Улучшения движка
+-   `Window_Base.prototype.drawImage(fileName, x, y, [w], [h])` — Рисует изображение из `img/pictures/` на содержимом окна.
+-   `item.onEquip(actor)` / `item.onUnequip(actor)` — Функции предметов, срабатывающие при надевании или снятии.
 
 ## Команды плагина
 
