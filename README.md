@@ -1,6 +1,6 @@
 # Dikarier Core Plugin for RPG Maker MZ
 
-**Version:** 1.3  
+**Version:** 1.4 
 **Author:** Dizia DK (Dikarier Plugin)  
 **License:** MIT
 
@@ -113,6 +113,10 @@ The `action` (optional) is a comparison string: `"=="`, `">="`, `"<="`, `">"`, `
 #### File Handling
 -   `DCore.getData(fileName)` - Asynchronously loads a JSON file from the `data/` folder (Returns a Promise).
 -   `DCore.getDataSync(fileName)` - Synchronously loads a JSON file (Requires Node.js/NW.js environment).
+
+#### Engine Enhancements
+-   `Window_Base.prototype.drawImage(fileName, x, y, [w], [h])` - Draws a picture from `img/pictures/` onto the window contents.
+-   `item.onEquip(actor)` / `item.onUnequip(actor)` - Callbacks added to data items that trigger when equipped or removed.
 
 ## Plugin Commands
 
