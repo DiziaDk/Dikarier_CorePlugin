@@ -1,6 +1,7 @@
+
 # Dikarier Core Plugin for RPG Maker MZ
 
-**Version:** 1.4 
+**Version:** 1.5
 **Author:** Dizia DK (Dikarier Plugin)  
 **License:** MIT
 
@@ -17,6 +18,9 @@ Dikarier Core (DCore) is the **fundamental library** for the Dikarier plugin eco
 **IMPORTANT:** This plugin is a **MANDATORY DEPENDENCY** for the following plugins:
 *   `Dikarier_NeedsSystem`
 *   `Dikarier_StatisticPlugin`
+*   `Dikarier_EffectSystem` (version 2.6 and above)
+*   `Dikarier_FastTravel`
+*   `Dikarier_WeatherControl`
 
 You must install **Dikarier Core** above these plugins in your Plugin Manager for them to function correctly.
 
@@ -104,6 +108,8 @@ The `action` (optional) is a comparison string: `"=="`, `">="`, `"<="`, `">"`, `
 -   `DCore.thisRegion()` - Returns the region ID the player is standing on.
 -   `DCore.membersInParty(ID)` - Checks if an actor with the specified ID is in the party.
 -   `DCore.changeName(ID, length)` - Opens the name change scene for an actor.
+-   `DCore.everyFrame(frame)` - Returns true every N frames.
+-   `DCore.everySecond(second)` - Returns true every N seconds (calculated exactly as 60 frames per second).
 
 #### Math & Probability
 -   `DCore.random(min, max)` - Returns a random integer between min and max.
