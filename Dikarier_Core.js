@@ -46,7 +46,7 @@
 
 var DCore = DCore || {};
 DCore.pluginName = "Dikarier_Core";
-DCore.pluginVersion = "1.4"; //For logs | Для логов
+DCore.pluginVersion = "1.5"; //For logs | Для логов
 
 /*:ru
  * @target MZ
