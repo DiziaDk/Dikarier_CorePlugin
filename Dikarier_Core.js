@@ -50,10 +50,20 @@ DCore.pluginVersion = "1.4"; //For logs | Для логов
 
 /*:ru
  * @target MZ
- * @plugindesc v1.4 Dikarier Core - Ядро системы Dikarier и сборник утилит.
+ * @plugindesc v1.5 Dikarier Core - Ядро системы Dikarier и сборник утилит.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.4
+ * @version 1.5
  * @url https://github.com/DiziaDk
+ *
+ * @param configs
+ * @text Общие конфигурации
+ *
+ * @param fullscreen
+ * @parent configs
+ * @text Полноэкранный режим
+ * @type boolean
+ * @desc Старт в полном экране. Для NW.js 0.107+ ОТКЛЮЧИТЕ и пропишите "fullscreen":true в package.json.
+ * @default true
  *
  * @param Binds
  * @text Привязки клавиш
@@ -1224,11 +1234,15 @@ const param = PluginManager.parameters(DCore.pluginName);
 //=============================================================================================
 
 (() => {
+    const fullscreen = param.fullscreen === "true";
+
+    if (!fullscreen) return;
+
     // Attempts to enter fullscreen mode right after the game boots | Пытается войти в полноэкранный режим сразу после загрузки игры
     const DCore_AutoFullscreen_Scene_Boot_start = Scene_Boot.prototype.start;
     Scene_Boot.prototype.start = function() {
         DCore_AutoFullscreen_Scene_Boot_start.call(this);
-
+        if (!Graphics._isFullScreen()) return;
         setTimeout(() => {
             Graphics._requestFullScreen();
         }, 100);
@@ -1472,7 +1486,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     const DCore_LocalSwitchTimer_Scene_Map_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function () {
         DCore_LocalSwitchTimer_Scene_Map_update.call(this);
-
+        if ($gameSystem.activeTimers.length > 0) return;
         const currentFrame = Graphics.frameCount;
         const activeTimers = $gameSystem.activeTimers;
 
@@ -1504,15 +1518,23 @@ const param = PluginManager.parameters(DCore.pluginName);
             this._secondTimers = {};
             this._gameDayTimers = {};
             this._gameHourTimers = {};
+            this._secondTimerCount = 0;
+            this._hourTimerCount = 0;
+            this._dayTimerCount = 0;
             this._nextSecondTimerId = 1;
             this._nextGameDayTimerId = 1;
             this._nextGameHourTimerId = 1;
             this._lastProcessedHourForGameTimers = -1;
         }
 
+        get activeTimersCount() {
+            return this._secondTimerCount + this._hourTimerCount + this._dayTimerCount;
+        }
+
         createSecondTimer(seconds, commonEventId) {
             const timerId = `sec_timer_${this._nextSecondTimerId++}`;
             const endTime = Date.now() + (seconds * 1000);
+            this._secondTimerCount++;
             this._secondTimers[timerId] = {
                 endTime: endTime,
                 commonEventId: commonEventId,
@@ -1524,7 +1546,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         createGameDayTimer(days, commonEventId) {
             const timerId = `day_timer_${this._nextGameDayTimerId++}`;
             const currentHour = $gameVariables.value(hourVariableId);
-
+            this._dayTimerCount++;
             if (currentHour < 0 || currentHour > 23) {
                 return null;
             }
@@ -1540,7 +1562,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         createGameHourTimer(hours, commonEventId) {
             const timerId = `hour_timer_${this._nextGameHourTimerId++}`;
             const currentHour = $gameVariables.value(hourVariableId);
-
+            this._hourTimerCount++;
             if (currentHour < 0 || currentHour > 23) {
                 return null;
             }
@@ -1568,11 +1590,10 @@ const param = PluginManager.parameters(DCore.pluginName);
             });
         }
 
-        updateGameDayTimers(currentGlobalHour) {
-            const completedTimers = [];
+		updateGameDayTimers(currentGlobalHour) {
+            const completedTimers =[];
             for (const timerId in this._gameDayTimers) {
                 const timer = this._gameDayTimers[timerId];
-
                 if (currentGlobalHour < timer.lastCheckedHour) {
                     timer.daysElapsed++;
                 }
@@ -1713,7 +1734,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     const DCore_Timer_Scene_Map_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
         DCore_Timer_Scene_Map_update.call(this);
-        if ($gameTimers) {
+        if ($gameTimers && $gameTimers.activeTimersCount > 0) {
             $gameTimers.update();
         }
     };
@@ -2165,16 +2186,17 @@ DCore.itemCount = function (id, action, count) {
         return amount >= count;
     }
 
-    if (action === "==") {
-        return amount === count;
-    } else if (action === ">=") {
-        return amount >= count;
-    } else if (action === "<=") {
-        return amount <= count;
-    } else if (action === ">") {
-        return amount > count;
-    } else if (action === "<") {
-        return amount < count;
+    switch (action) {
+        case "==":
+            return amount === count;
+        case ">=":
+            return amount >= count;
+        case "<=":
+            return amount <= count;
+        case ">":
+            return amount > count;
+        case "<":
+            return amount < count;
     }
 
     return false;
@@ -2192,16 +2214,17 @@ DCore.weaponCount = function (id, action, count) {
         return amount >= count;
     }
 
-    if (action === "==") {
-        return amount === count;
-    } else if (action === ">=") {
-        return amount >= count;
-    } else if (action === "<=") {
-        return amount <= count;
-    } else if (action === ">") {
-        return amount > count;
-    } else if (action === "<") {
-        return amount < count;
+    switch (action) {
+        case "==":
+            return amount === count;
+        case ">=":
+            return amount >= count;
+        case "<=":
+            return amount <= count;
+        case ">":
+            return amount > count;
+        case "<":
+            return amount < count;
     }
 
     return false;
@@ -2219,16 +2242,17 @@ DCore.armorCount = function (id, action, count) {
         return amount >= count;
     }
 
-    if (action === "==") {
-        return amount === count;
-    } else if (action === ">=") {
-        return amount >= count;
-    } else if (action === "<=") {
-        return amount <= count;
-    } else if (action === ">") {
-        return amount > count;
-    } else if (action === "<") {
-        return amount < count;
+    switch (action) {
+        case "==":
+            return amount === count;
+        case ">=":
+            return amount >= count;
+        case "<=":
+            return amount <= count;
+        case ">":
+            return amount > count;
+        case "<":
+            return amount < count;
     }
 
     return false;
@@ -2311,6 +2335,25 @@ Game_Actor.prototype.changeEquip = function(slotId, item) {
         item.onEquip(this);
     }
 }
+
+DCore.everyFrame = function(frame) {
+    const frames = Graphics.frameCount;
+    return frames % frame === 0;
+}
+
+DCore.everySecond = function(second) {
+    const frames = Graphics.frameCount;
+    return frames % (second * 60) === 0;
+}
+
+// For NW.js 0.107.0+ || Для NW.js 0.107.0+
+Bitmap.prototype._createCanvas = function(width, height) {
+    this._canvas = document.createElement("canvas");
+    this._context = this._canvas.getContext("2d", {willReadFrequently: true});
+    this._canvas.width = width;
+    this._canvas.height = height;
+    this._createBaseTexture(this._canvas);
+};
 
 console.log(`${DCore.pluginName} v${DCore.pluginVersion} has been successfully loaded.`);
 
