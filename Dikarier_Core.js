@@ -45,14 +45,17 @@
 //=============================================================================
 
 var DCore = DCore || {};
-DCore.pluginName = "Dikarier_Core";
-DCore.pluginVersion = "1.5"; //For logs | Для логов
+DCore.Utils = DCore.Utils || {};
+DCore.meta = DCore.meta || {};
+DCore.keyBinds = DCore.keyBinds || [];
+DCore.meta.pluginName = "Dikarier_Core";
+DCore.meta.pluginVersion = "2.0";
 
 /*:ru
  * @target MZ
- * @plugindesc v1.5 Dikarier Core - Ядро системы Dikarier и сборник утилит.
+ * @plugindesc v2.0 Dikarier Core - Ядро системы Dikarier и сборник утилит.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.5
+ * @version 2.0
  * @url https://github.com/DiziaDk
  *
  * @param configs
@@ -117,9 +120,9 @@ DCore.pluginVersion = "1.5"; //For logs | Для логов
  * @parent PrintSongSettings
  * @text Файл звука
  * @desc Файл звука печатания (из папки /audio/se/).
- * @default Cursor1
- * @type file
- * @dir audio/se/
+ * @default []
+ * @type file[]
+ * @dir audio/ss/
  *
  * @param Volume
  * @parent PrintSongSettings
@@ -507,9 +510,9 @@ DCore.pluginVersion = "1.5"; //For logs | Для логов
 
 /*:en
  * @target MZ
- * @plugindesc v1.4 Dikarier Core - Core system for Dikarier and utility collection.
+ * @plugindesc v2.0 Dikarier Core - Core system for Dikarier and utility collection.
  * @author Dizia DK (Dikarier Plugin)
- * @version 1.4
+ * @version 2.0
  * @url https://github.com/DiziaDk
  *
  * @param Binds
@@ -565,7 +568,7 @@ DCore.pluginVersion = "1.5"; //For logs | Для логов
  * @text Sound File
  * @desc The typing sound file (from /audio/se/ folder).
  * @default Cursor1
- * @type file
+ * @type file[]
  * @dir audio/se/
  *
  * @param Volume
@@ -988,18 +991,223 @@ DCore.pluginVersion = "1.5"; //For logs | Для логов
  * @desc The JavaScript code to execute.
  */
 
-const param = PluginManager.parameters(DCore.pluginName);
+const param = PluginManager.parameters(DCore.meta.pluginName);
+
+//=============================================================================================
+// Dikarier_Core: API
+//=============================================================================================
+
+DCore.Sprite = class extends Sprite {
+    initialize(bitmap, frameWidth, frameHeight) {
+        super.initialize(bitmap);
+        this._frameWidth = frameWidth;
+        this._frameHeight = frameHeight;
+        this._positionX = 0;
+        this._positionY = 0;
+
+        this.setFrame(this._positionX, this._positionY, this._frameWidth, this._frameHeight);
+    }
+
+    nextFrame() {
+        if (!this.bitmap || !this.bitmap.isReady())
+            this._positionX += this._frameWidth;
+        if (this._positionX >= this.bitmap.width) {
+            this._positionX = 0;
+            this._positionY += this._frameHeight;
+
+            if (this._positionY >= this.bitmap.height) {
+                this._positionY = 0;
+            }
+        }
+        this.setFrame(this._positionX, this._positionY, this._frameWidth, this._frameHeight);
+    }
+}
+
+DCore.Scene = class extends Scene_MenuBase {
+    initialize() {
+        super.initialize();
+        this.createTouchButtons = false;
+        this.bindExit = true;
+    }
+
+    update() {
+        super.update();
+        if (Input.isTriggered("cancel") && this.bindExit) {
+            SceneManager.pop();
+        }
+    }
+
+    createButtons() {
+        if (this.createTouchButtons) {
+            super.createButtons();
+        }
+    }
+}
+
+DCore.Utils.itemCount = function (id, action, count) {
+    if (count === undefined) {
+        count = action;
+        action = undefined;
+    }
+
+    var amount = $gameParty.numItems($dataItems[id]);
+
+    if (action === undefined) {
+        return amount >= count;
+    }
+
+    switch (action) {
+        case "==":
+            return amount === count;
+        case ">=":
+            return amount >= count;
+        case "<=":
+            return amount <= count;
+        case ">":
+            return amount > count;
+        case "<":
+            return amount < count;
+    }
+
+    return false;
+};
+
+DCore.Utils.weaponCount = function (id, action, count) {
+    if (count === undefined) {
+        count = action;
+        action = undefined;
+    }
+
+    var amount = $gameParty.numItems($dataWeapons[id]);
+
+    if (action === undefined) {
+        return amount >= count;
+    }
+
+    switch (action) {
+        case "==":
+            return amount === count;
+        case ">=":
+            return amount >= count;
+        case "<=":
+            return amount <= count;
+        case ">":
+            return amount > count;
+        case "<":
+            return amount < count;
+    }
+
+    return false;
+};
+
+DCore.Utils.armorCount = function (id, action, count) {
+    if (count === undefined) {
+        count = action;
+        action = undefined;
+    }
+
+    var amount = $gameParty.numItems($dataArmors[id]);
+
+    if (action === undefined) {
+        return amount >= count;
+    }
+
+    switch (action) {
+        case "==":
+            return amount === count;
+        case ">=":
+            return amount >= count;
+        case "<=":
+            return amount <= count;
+        case ">":
+            return amount > count;
+        case "<":
+            return amount < count;
+    }
+
+    return false;
+};
+
+DCore.Utils.random = function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+DCore.Utils.randFloat = function(min, max) {
+    return Math.random() * (max - min) + min;
+};
+
+DCore.Utils.randomProb = function(persent) {
+    if (persent >= 100) {
+        return true;
+    }
+    if (persent <= 0) {
+        return false;
+    }
+    return Math.random() * 100 < persent;
+}
+
+DCore.Utils.thisRegion = function() { // No argument function || Вариант функции без аргументов
+    return $gameMap.regionId($gamePlayer.x, $gamePlayer.y);
+}
+
+DCore.Utils.membersInParty = function(ID) {
+    return $gameParty.members().some(actor => actor.actorId() === ID);
+};
+
+DCore.Utils.changeName = function(ID, length) {
+    SceneManager.push(Scene_Name);
+    SceneManager.prepareNextScene(ID, length);
+};
+
+DCore.Utils.getData = async function(fileName) { // For then usage || Для использования then
+    const fileUrl = "data/DCore/" + fileName + ".json";
+    const response = await fetch(fileUrl);
+    const text = await response.text();
+    return JSON.parse(text);
+}
+
+DCore.Utils.getDataSync = function(fileName) { // For no async usage (Not work in browser) || Для несинхронного использования (Не работает в браузере)
+    const file = require("fs");
+    const fileUrl = "data/DCore/" + fileName + ".json";
+    const text = file.readFileSync(fileUrl, "utf-8");
+    return JSON.parse(text);
+}
+
+// For not Dikarier plugins || Для плагинов не от Dikarier
+DCore.Utils.loadData = async function(fileName) {
+    const fileUrl = "data/" + fileName + ".json";
+    const response = await fetch(fileUrl);
+    const text = await response.text();
+    return JSON.parse(text);
+}
+
+DCore.Utils.loadDataSync = function(fileName) {
+    const file = require("fs");
+    const fileUrl = "data/" + fileName + ".json";
+    const text = file.readFileSync(fileUrl, "utf-8");
+    return JSON.parse(text);
+}
+
+DCore.Utils.everyFrame = function(frame) {
+    const frames = Graphics.frameCount;
+    return frames % frame === 0;
+}
+
+DCore.Utils.everySecond = function(second) {
+    const frames = Graphics.frameCount;
+    return frames % (second * 60) === 0;
+}
 
 //=============================================================================================
 // Dikarier_Core: Key Bindings for Common Events | Привязки клавиш к общим событиям
 //=============================================================================================
 
-(() => {
+~(() => {
     const debug = param.Debug === "true";
 
-    let keyBindings; // JSON bind parser | JSON парсер для биндов
+    // JSON bind parser | JSON парсер для биндов
     try {
-        keyBindings = JSON.parse(param.KeyBindings || '[]').map(binding => {
+        DCore.keyBinds = JSON.parse(param.KeyBindings || '[]').map(binding => {
             const parsed = JSON.parse(binding);
             if (debug) {
                 console.log("Parsing binding:", parsed);
@@ -1011,11 +1219,33 @@ const param = PluginManager.parameters(DCore.pluginName);
         });
     } catch (e) {
         console.error("Failed to parse KeyBindings:", e);
-        keyBindings = [];
+        DCore.keyBinds = [];
     }
 
     if (debug) {
-        console.log("Initialized bindings:", keyBindings);
+        console.log("Initialized bindings:", DCore.keyBinds);
+    }
+
+    DCore.changeBind = function(originalKey, newKey) {
+        const obj = DCore.keyBinds.find(item => item.key === originalKey);
+        if (obj) {
+            obj.key = newKey;
+            return true;
+        }
+        return false;
+    }
+
+    const DCoreBind_Input_isTriggered = Input.isTriggered;
+    Input.isTriggered = function(keyName) {
+        if (keyName.length > 1) {
+            return DCoreBind_Input_isTriggered.call(this, keyName);
+        }
+        if (!Object.values(Input.keyMapper).includes(keyName)) {
+            const code = keyName.toUpperCase().charCodeAt(0);
+            Input.keyMapper[code] = keyName;
+            return DCoreBind_Input_isTriggered.call(this, keyName);
+        }
+        return DCoreBind_Input_isTriggered.call(this, keyName);
     }
 
     // Extends the map update loop to check for hotkeys | Расширяет цикл обновления карты для проверки горячих клавиш
@@ -1029,7 +1259,7 @@ const param = PluginManager.parameters(DCore.pluginName);
 
     // Handles key presses and calls the corresponding common event | Обрабатывает нажатия клавиш и вызывает соответствующее общее событие
     Scene_Map.prototype.checkCommonEventHotkeys = function() {
-        keyBindings.forEach(binding => {
+        DCore.keyBinds.forEach(binding => {
             if (Input.isTriggered(binding.key.toUpperCase()) || Input.isTriggered(binding.key.toLowerCase())) {
                 if (debug) {
                     console.log(`Key ${binding.key} pressed, triggering common event ${binding.commonEventId}`);
@@ -1114,6 +1344,10 @@ const param = PluginManager.parameters(DCore.pluginName);
 
         for (const armor of $dataArmors) {
             if (armor) processNoteTags(armor);
+        }
+
+        for (const enemy of $dataEnemies) {
+            if (enemy) processNoteTags(enemy);
         }
 
         return true;
@@ -1235,7 +1469,16 @@ const param = PluginManager.parameters(DCore.pluginName);
 
 (() => {
     const fullscreen = param.fullscreen === "true";
+    let alreadyFull = false;
 
+    const DCore_AutoFullScreen_Scene_Boot_adjustWindow = Scene_Boot.prototype.adjustWindow;
+    Scene_Boot.prototype.adjustWindow = function() {
+        if (typeof require !== "undefined") {
+            const pkg = require("package.json");
+            if (pkg.window.fullscreen) return;
+        }
+        DCore_AutoFullScreen_Scene_Boot_adjustWindow.call(this);
+    }
     if (!fullscreen) return;
 
     // Attempts to enter fullscreen mode right after the game boots | Пытается войти в полноэкранный режим сразу после загрузки игры
@@ -1244,6 +1487,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         DCore_AutoFullscreen_Scene_Boot_start.call(this);
         if (!Graphics._isFullScreen()) return;
         setTimeout(() => {
+            if (!alreadyFull) return;
             Graphics._requestFullScreen();
         }, 100);
     };
@@ -1254,6 +1498,8 @@ const param = PluginManager.parameters(DCore.pluginName);
         DCore_AutoFullscreen_Scene_Title_create.call(this);
 
         if (!Graphics._isFullScreen()) {
+            if (alreadyFull) return;
+            alreadyFull = true;
             Graphics._requestFullScreen();
         }
     };
@@ -1268,6 +1514,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     const fadeTime = Number(param['fadeTime'] || 2);
 
     let currentNightBgm = null;
+    let currentAlterBgm = null;
 
     // Overrides default BGM playback to play night BGM if conditions are met | Переопределяет стандартное воспроизведение BGM для проигрывания ночной музыки, если условия соблюдены
     const DCore_NightOST_Game_Map_autoplay = Game_Map.prototype.autoplay;
@@ -1275,34 +1522,69 @@ const param = PluginManager.parameters(DCore.pluginName);
         if ($dataMap.bgm && ($dataMap.bgm.name || '').length > 0) {
             const nightBgm = this.getNightBgmFileName();
 
-            if ($gameSwitches.value(switchId) && nightBgm !== null) {
-                if (nightBgm === "None") {
-                    AudioManager.stopBgm();
-                    currentNightBgm = "None";
-                    return;
+            if (nightBgm !== null) {
+                currentAlterBgm = null;
+                if ($gameSwitches.value(switchId)) {
+                    if (nightBgm === "None") {
+                        AudioManager.stopBgm();
+                        currentNightBgm = "None";
+                        return;
+                    }
+
+                    if (AudioManager._currentBgm && AudioManager._currentBgm.name === nightBgm) {
+                        return;
+                    }
+
+                    currentNightBgm = nightBgm;
+
+                    AudioManager.playBgm({
+                        name: nightBgm,
+                        volume: 100,
+                        pitch: 100,
+                        pan: 0
+                    }, 0);
+                } else {
+                    if (AudioManager._currentBgm &&
+                        AudioManager._currentBgm.name === $dataMap.bgm.name) {
+                        return;
+                    }
+
+                    currentNightBgm = null;
+
+                    DCore_NightOST_Game_Map_autoplay.call(this);
                 }
-
-                if (AudioManager._currentBgm && AudioManager._currentBgm.name === nightBgm) {
-                    return;
-                }
-
-                currentNightBgm = nightBgm;
-
-                AudioManager.playBgm({
-                    name: nightBgm,
-                    volume: 100,
-                    pitch: 100,
-                    pan: 0
-                }, 0);
             } else {
-                if (AudioManager._currentBgm &&
-                    AudioManager._currentBgm.name === $dataMap.bgm.name) {
-                    return;
-                }
-
                 currentNightBgm = null;
+                const alterBgm = this.getAlterBgmData();
+                if (alterBgm !== null && $gameSwitches.value(alterBgm.switchId)) {
+                    if (alterBgm.filename === "None") {
+                        AudioManager.stopBgm();
+                        currentAlterBgm = "None";
+                        return;
+                    }
 
-                DCore_NightOST_Game_Map_autoplay.call(this);
+                    if (AudioManager._currentBgm && AudioManager._currentBgm.name === alterBgm.filename) {
+                        return;
+                    }
+
+                    currentAlterBgm = alterBgm.filename;
+
+                    AudioManager.playBgm({
+                        name: alterBgm.filename,
+                        volume: 100,
+                        pitch: 100,
+                        pan: 0
+                    }, 0);
+                } else {
+                    if (AudioManager._currentBgm &&
+                        AudioManager._currentBgm.name === $dataMap.bgm.name) {
+                        return;
+                    }
+
+                    currentAlterBgm = null;
+
+                    DCore_NightOST_Game_Map_autoplay.call(this);
+                }
             }
         }
     };
@@ -1314,14 +1596,36 @@ const param = PluginManager.parameters(DCore.pluginName);
         return match ? match[1].trim() : null;
     };
 
+    Game_Map.prototype.getAlterBgmData = function() {
+        const note = $dataMap.note || '';
+        const match = note.match(/<DikarierAlterOST:\s*(\d+)\s*,\s*(.+?)>/i);
+        if (match) {
+            return {
+                switchId: Number(match[1]),
+                filename: match[2].trim()
+            };
+        }
+        return null;
+    };
+
     // Triggers a BGM update when the designated night switch changes value | Запускает обновление BGM при изменении значения переключателя ночи
     const DCore_NightOST_Game_Switches_setValue = Game_Switches.prototype.setValue;
     Game_Switches.prototype.setValue = function(switchId, value) {
         const oldValue = this.value(switchId);
         DCore_NightOST_Game_Switches_setValue.call(this, switchId, value);
 
-        if (switchId === Number(param['switchId']) && oldValue !== value && $gameMap && $dataMap) {
-            updateCurrentMapBgm();
+        if ($gameMap && $dataMap && oldValue !== value) {
+            const nightBgm = $gameMap.getNightBgmFileName();
+            if (nightBgm !== null) {
+                if (switchId === Number(param['switchId'])) {
+                    updateCurrentMapBgm();
+                }
+            } else {
+                const alterBgm = $gameMap.getAlterBgmData();
+                if (alterBgm !== null && switchId === alterBgm.switchId) {
+                    updateCurrentMapBgm();
+                }
+            }
         }
     };
 
@@ -1329,50 +1633,103 @@ const param = PluginManager.parameters(DCore.pluginName);
     function updateCurrentMapBgm() {
         const nightBgm = $gameMap.getNightBgmFileName();
 
-        if ($gameSwitches.value(switchId) && nightBgm !== null) {
-            if (nightBgm === "None") {
-                if (currentNightBgm === "None") {
+        if (nightBgm !== null) {
+            currentAlterBgm = null;
+            if ($gameSwitches.value(switchId)) {
+                if (nightBgm === "None") {
+                    if (currentNightBgm === "None") {
+                        return;
+                    }
+
+                    AudioManager.fadeOutBgm(fadeTime);
+                    setTimeout(() => {
+                        currentNightBgm = "None";
+                        AudioManager.stopBgm();
+                    }, fadeTime * 1000);
+                    return;
+                }
+
+                if (AudioManager._currentBgm && AudioManager._currentBgm.name === nightBgm) {
                     return;
                 }
 
                 AudioManager.fadeOutBgm(fadeTime);
                 setTimeout(() => {
-                    currentNightBgm = "None";
-                    AudioManager.stopBgm();
+                    currentNightBgm = nightBgm;
+
+                    AudioManager.playBgm({
+                        name: nightBgm,
+                        volume: 100,
+                        pitch: 100,
+                        pan: 0
+                    }, fadeTime);
                 }, fadeTime * 1000);
-                return;
-            }
-
-            if (AudioManager._currentBgm && AudioManager._currentBgm.name === nightBgm) {
-                return;
-            }
-
-            AudioManager.fadeOutBgm(fadeTime);
-            setTimeout(() => {
-                currentNightBgm = nightBgm;
-
-                AudioManager.playBgm({
-                    name: nightBgm,
-                    volume: 100,
-                    pitch: 100,
-                    pan: 0
-                }, fadeTime);
-            }, fadeTime * 1000);
-        } else if (!$gameSwitches.value(switchId)) {
-            if (AudioManager._currentBgm &&
-                $dataMap.bgm &&
-                AudioManager._currentBgm.name === $dataMap.bgm.name) {
-                return;
-            }
-
-            AudioManager.fadeOutBgm(fadeTime);
-            setTimeout(() => {
-                currentNightBgm = null;
-
-                if ($dataMap.bgm && $dataMap.bgm.name) {
-                    AudioManager.playBgm($dataMap.bgm, fadeTime);
+            } else if (!$gameSwitches.value(switchId)) {
+                if (AudioManager._currentBgm &&
+                    $dataMap.bgm &&
+                    AudioManager._currentBgm.name === $dataMap.bgm.name) {
+                    return;
                 }
-            }, fadeTime * 1000);
+
+                AudioManager.fadeOutBgm(fadeTime);
+                setTimeout(() => {
+                    currentNightBgm = null;
+
+                    if ($dataMap.bgm && $dataMap.bgm.name) {
+                        AudioManager.playBgm($dataMap.bgm, fadeTime);
+                    }
+                }, fadeTime * 1000);
+            }
+        } else {
+            currentNightBgm = null;
+            const alterBgm = $gameMap.getAlterBgmData();
+            if (alterBgm !== null) {
+                if ($gameSwitches.value(alterBgm.switchId)) {
+                    if (alterBgm.filename === "None") {
+                        if (currentAlterBgm === "None") {
+                            return;
+                        }
+
+                        AudioManager.fadeOutBgm(fadeTime);
+                        setTimeout(() => {
+                            currentAlterBgm = "None";
+                            AudioManager.stopBgm();
+                        }, fadeTime * 1000);
+                        return;
+                    }
+
+                    if (AudioManager._currentBgm && AudioManager._currentBgm.name === alterBgm.filename) {
+                        return;
+                    }
+
+                    AudioManager.fadeOutBgm(fadeTime);
+                    setTimeout(() => {
+                        currentAlterBgm = alterBgm.filename;
+
+                        AudioManager.playBgm({
+                            name: alterBgm.filename,
+                            volume: 100,
+                            pitch: 100,
+                            pan: 0
+                        }, fadeTime);
+                    }, fadeTime * 1000);
+                } else if (!$gameSwitches.value(alterBgm.switchId)) {
+                    if (AudioManager._currentBgm &&
+                        $dataMap.bgm &&
+                        AudioManager._currentBgm.name === $dataMap.bgm.name) {
+                        return;
+                    }
+
+                    AudioManager.fadeOutBgm(fadeTime);
+                    setTimeout(() => {
+                        currentAlterBgm = null;
+
+                        if ($dataMap.bgm && $dataMap.bgm.name) {
+                            AudioManager.playBgm($dataMap.bgm, fadeTime);
+                        }
+                    }, fadeTime * 1000);
+                }
+            }
         }
     }
 
@@ -1383,36 +1740,73 @@ const param = PluginManager.parameters(DCore.pluginName);
 
         const nightBgm = $gameMap.getNightBgmFileName();
 
-        if ($gameSwitches.value(switchId) && nightBgm !== null) {
-            if (nightBgm === "None") {
-                if (currentNightBgm === "None") {
+        if (nightBgm !== null) {
+            currentAlterBgm = null;
+            if ($gameSwitches.value(switchId)) {
+                if (nightBgm === "None") {
+                    if (currentNightBgm === "None") {
+                        return;
+                    }
+
+                    AudioManager.fadeOutBgm(fadeTime);
+                    setTimeout(() => {
+                        currentNightBgm = "None";
+                        AudioManager.stopBgm();
+                    }, fadeTime * 1000);
+                    return;
+                }
+
+                if (currentNightBgm === nightBgm && AudioManager._currentBgm &&
+                    AudioManager._currentBgm.name === nightBgm) {
                     return;
                 }
 
                 AudioManager.fadeOutBgm(fadeTime);
                 setTimeout(() => {
-                    currentNightBgm = "None";
-                    AudioManager.stopBgm();
+                    currentNightBgm = nightBgm;
+
+                    AudioManager.playBgm({
+                        name: nightBgm,
+                        volume: 100,
+                        pitch: 100,
+                        pan: 0
+                    }, fadeTime);
                 }, fadeTime * 1000);
-                return;
             }
+        } else {
+            currentNightBgm = null;
+            const alterBgm = $gameMap.getAlterBgmData();
+            if (alterBgm !== null && $gameSwitches.value(alterBgm.switchId)) {
+                if (alterBgm.filename === "None") {
+                    if (currentAlterBgm === "None") {
+                        return;
+                    }
 
-            if (currentNightBgm === nightBgm && AudioManager._currentBgm &&
-                AudioManager._currentBgm.name === nightBgm) {
-                return;
+                    AudioManager.fadeOutBgm(fadeTime);
+                    setTimeout(() => {
+                        currentAlterBgm = "None";
+                        AudioManager.stopBgm();
+                    }, fadeTime * 1000);
+                    return;
+                }
+
+                if (currentAlterBgm === alterBgm.filename && AudioManager._currentBgm &&
+                    AudioManager._currentBgm.name === alterBgm.filename) {
+                    return;
+                }
+
+                AudioManager.fadeOutBgm(fadeTime);
+                setTimeout(() => {
+                    currentAlterBgm = alterBgm.filename;
+
+                    AudioManager.playBgm({
+                        name: alterBgm.filename,
+                        volume: 100,
+                        pitch: 100,
+                        pan: 0
+                    }, fadeTime);
+                }, fadeTime * 1000);
             }
-
-            AudioManager.fadeOutBgm(fadeTime);
-            setTimeout(() => {
-                currentNightBgm = nightBgm;
-
-                AudioManager.playBgm({
-                    name: nightBgm,
-                    volume: 100,
-                    pitch: 100,
-                    pan: 0
-                }, fadeTime);
-            }, fadeTime * 1000);
         }
     };
 
@@ -1424,27 +1818,55 @@ const param = PluginManager.parameters(DCore.pluginName);
         setTimeout(() => {
             if ($gameMap && $dataMap) {
                 const nightBgm = $gameMap.getNightBgmFileName();
-                if ($gameSwitches.value(switchId) && nightBgm !== null) {
-                    if (nightBgm === "None") {
-                        currentNightBgm = "None";
+                if (nightBgm !== null) {
+                    currentAlterBgm = null;
+                    if ($gameSwitches.value(switchId)) {
+                        if (nightBgm === "None") {
+                            currentNightBgm = "None";
+                            AudioManager.fadeOutBgm(fadeTime);
+                            setTimeout(() => {
+                                AudioManager.stopBgm();
+                            }, fadeTime * 1000);
+                            return;
+                        }
+
+                        currentNightBgm = nightBgm;
+
                         AudioManager.fadeOutBgm(fadeTime);
                         setTimeout(() => {
-                            AudioManager.stopBgm();
+                            AudioManager.playBgm({
+                                name: nightBgm,
+                                volume: 100,
+                                pitch: 100,
+                                pan: 0
+                            }, fadeTime);
                         }, fadeTime * 1000);
-                        return;
                     }
+                } else {
+                    currentNightBgm = null;
+                    const alterBgm = $gameMap.getAlterBgmData();
+                    if (alterBgm !== null && $gameSwitches.value(alterBgm.switchId)) {
+                        if (alterBgm.filename === "None") {
+                            currentAlterBgm = "None";
+                            AudioManager.fadeOutBgm(fadeTime);
+                            setTimeout(() => {
+                                AudioManager.stopBgm();
+                            }, fadeTime * 1000);
+                            return;
+                        }
 
-                    currentNightBgm = nightBgm;
+                        currentAlterBgm = alterBgm.filename;
 
-                    AudioManager.fadeOutBgm(fadeTime);
-                    setTimeout(() => {
-                        AudioManager.playBgm({
-                            name: nightBgm,
-                            volume: 100,
-                            pitch: 100,
-                            pan: 0
-                        }, fadeTime);
-                    }, fadeTime * 1000);
+                        AudioManager.fadeOutBgm(fadeTime);
+                        setTimeout(() => {
+                            AudioManager.playBgm({
+                                name: alterBgm.filename,
+                                volume: 100,
+                                pitch: 100,
+                                pan: 0
+                            }, fadeTime);
+                        }, fadeTime * 1000);
+                    }
                 }
             }
         }, 500);
@@ -1464,7 +1886,7 @@ const param = PluginManager.parameters(DCore.pluginName);
     };
 
     // Plugin command for starting a timer | Команда плагина для запуска таймера
-    PluginManager.registerCommand(DCore.pluginName, "startTimer", function (args) {
+    PluginManager.registerCommand(DCore.meta.pluginName, "startTimer", function (args) {
         if (!this._eventId) return;
 
         const mapId = $gameMap.mapId();
@@ -1739,19 +2161,19 @@ const param = PluginManager.parameters(DCore.pluginName);
         }
     };
 
-    PluginManager.registerCommand(DCore.pluginName, "startSecondTimer", args => {
+    PluginManager.registerCommand(DCore.meta.pluginName, "startSecondTimer", args => {
         const seconds = Number(args.seconds) || 60;
         const commonEventId = Number(args.commonEventId) || 1;
         $gameTimers.createSecondTimer(seconds, commonEventId);
     });
 
-    PluginManager.registerCommand(DCore.pluginName, "startGameDayTimer", args => {
+    PluginManager.registerCommand(DCore.meta.pluginName, "startGameDayTimer", args => {
         const days = Number(args.days) || 3;
         const commonEventId = Number(args.commonEventId) || 1;
         $gameTimers.createGameDayTimer(days, commonEventId);
     });
 
-    PluginManager.registerCommand(DCore.pluginName, "startGameHourTimer", args => {
+    PluginManager.registerCommand(DCore.meta.pluginName, "startGameHourTimer", args => {
         const hours = Number(args.hours) || 6;
         const commonEventId = Number(args.commonEventId) || 1;
         $gameTimers.createGameHourTimer(hours, commonEventId);
@@ -1763,13 +2185,28 @@ const param = PluginManager.parameters(DCore.pluginName);
 //=============================================================================================
 
 (() => {
-    const soundFile = String(param['Sound File'] || 'Cursor1');
     const volume = Number(param['Volume'] || 50);
     const pitch = Number(param['Pitch'] || 100);
     const playOnWindow = param['PlayOnWindow'] === 'true';
     const playOnDimBackground = param['PlayOnDimBackground'] === 'true';
     const playOnTransparent = param['PlayOnTransparent'] === 'true';
     const soundInterval = Number(param['SoundInterval'] || 2);
+    const soundFile = (() => {
+        try {
+            const rawString = param['Sound File'] || 'Cursor1';
+            return JSON.parse(rawString).map(item => {
+                return String(item);
+            });
+        }
+        catch (e) {
+            return [];
+        }
+    })();
+
+    function randomSound() {
+        const maxIndex = soundFile.length - 1;
+        return soundFile[DCore.Utils.random(0, maxIndex)];
+    }
 
     const DCore_PrintSong_Window_Message_processCharacter = Window_Message.prototype.processCharacter;
     const DCore_PrintSong_Window_Message_processEscapeCharacter = Window_Message.prototype.processEscapeCharacter;
@@ -1805,13 +2242,13 @@ const param = PluginManager.parameters(DCore.pluginName);
             soundCounter = (soundCounter + 1) % soundInterval;
             if (soundCounter === 0) {
                 const sound = {
-                    name: soundFile,
+                    name: randomSound(),
                     volume: volume,
                     pitch: pitch,
                     pan: 0
                 };
                 try {
-                    AudioManager.playSe(sound);
+                    AudioManager.playSs(sound);
                 } catch (e) {
                     console.error("TypingSoundEffect: Sound playback error", e);
                 }
@@ -1935,7 +2372,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         }
     };
 
-    class Scene_Exit extends Scene_MenuBase {
+    class Scene_Exit extends DCore.Scene {
         create() {
             super.create();
             this.createWindows(this);
@@ -1950,22 +2387,11 @@ const param = PluginManager.parameters(DCore.pluginName);
             };
         }
 
-        createButtons() {
-            this._buttons = []; // Placeholder to avoid creating buttons (Not used) || Заглушка чтобы не создавать кнопки(Не используется)
-        }
-
         createBackground() { // For remove blur || Чтобы убрать размытие
             this._backgroundSprite = new Sprite();
             this._backgroundSprite.bitmap = SceneManager.backgroundBitmap();
             this._backgroundSprite.opacity = exitOpacity; // Background opacity || Прозрачность фона
             this.addChild(this._backgroundSprite);
-        }
-
-        update() {
-            super.update();
-            if (Input.isTriggered("cancel")) {
-                SceneManager.pop();
-            }
         }
 
         _alignX(text) {
@@ -2044,7 +2470,7 @@ const param = PluginManager.parameters(DCore.pluginName);
 //=============================================================================================
 
 (() => {
-    PluginManager.registerCommand(DCore.pluginName, 'triggerError', args => { // Register command || Регистрация комманды
+    PluginManager.registerCommand(DCore.meta.pluginName, 'triggerError', args => { // Register command || Регистрация комманды
         const erorrTitle = args.errorTitle || "Error";
         const errorMessage = args.errorMessage || "Critical error!";
         const buttonText = args.buttonText || "Confirm";
@@ -2064,7 +2490,7 @@ const param = PluginManager.parameters(DCore.pluginName);
         }
     }
 
-    class Scene_Error extends Scene_MenuBase {
+    class Scene_Error extends DCore.Scene {
         create() {
             super.create();
             this.createWindows(this);
@@ -2077,24 +2503,12 @@ const param = PluginManager.parameters(DCore.pluginName);
                 height: Number(param['errorWindowHeight'] || 210),
                 width: Number(param['errorWindowWidth'] || 400)
             };
-            console.error("Window_Error: Width: " + this._drawingMainWindow.width + "Height: " + this._drawingMainWindow.height);
         }
 
         prepare(erorrTitle, errorMessage, buttonText) { // Geting "prepareNextScene" parameters || Получение параметров "prepareNextScene"
             this._errorTitle = erorrTitle;
             this._errorMessage = errorMessage;
             this._buttonText = buttonText;
-        }
-
-        createButtons() {
-            this._buttons = [];
-        }
-
-        update() {
-            super.update();
-            if (Input.isTriggered("cancel")) {
-                SceneManager.exit(); //
-            }
         }
 
         getRectangle(type) {
@@ -2165,145 +2579,6 @@ const param = PluginManager.parameters(DCore.pluginName);
 })();
 
 //=============================================================================================
-// Dikarier_Core: Mini API functions | Минимальные функции API
-//=============================================================================================
-
-// These API functions were created due to the limitations of the engine for checking items. At first, the engine
-// could only check for the presence of items, and these functions are aimed at fixing this. (Other simplify long functions)
-
-// Эти апи функции были сделаны из-за ограничения движка на проверку предметов. Изначально в движке можно проверить
-// только наличине предметов а эти функции нацелены это исправить. (Другие упрощают длинные функции)
-
-DCore.itemCount = function (id, action, count) {
-    if (count === undefined) {
-        count = action;
-        action = undefined;
-    }
-
-    var amount = $gameParty.numItems($dataItems[id]);
-
-    if (action === undefined) {
-        return amount >= count;
-    }
-
-    switch (action) {
-        case "==":
-            return amount === count;
-        case ">=":
-            return amount >= count;
-        case "<=":
-            return amount <= count;
-        case ">":
-            return amount > count;
-        case "<":
-            return amount < count;
-    }
-
-    return false;
-};
-
-DCore.weaponCount = function (id, action, count) {
-    if (count === undefined) {
-        count = action;
-        action = undefined;
-    }
-
-    var amount = $gameParty.numItems($dataWeapons[id]);
-
-    if (action === undefined) {
-        return amount >= count;
-    }
-
-    switch (action) {
-        case "==":
-            return amount === count;
-        case ">=":
-            return amount >= count;
-        case "<=":
-            return amount <= count;
-        case ">":
-            return amount > count;
-        case "<":
-            return amount < count;
-    }
-
-    return false;
-};
-
-DCore.armorCount = function (id, action, count) {
-    if (count === undefined) {
-        count = action;
-        action = undefined;
-    }
-
-    var amount = $gameParty.numItems($dataArmors[id]);
-
-    if (action === undefined) {
-        return amount >= count;
-    }
-
-    switch (action) {
-        case "==":
-            return amount === count;
-        case ">=":
-            return amount >= count;
-        case "<=":
-            return amount <= count;
-        case ">":
-            return amount > count;
-        case "<":
-            return amount < count;
-    }
-
-    return false;
-};
-
-DCore.random = function(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-DCore.randFloat = function(min, max) {
-    return Math.random() * (max - min) + min;
-};
-
-DCore.persentRandom = function(persent) {
-    if (persent >= 100) {
-        return true;
-    }
-    if (persent <= 0) {
-        return false;
-    }
-    return Math.random() * 100 < persent;
-}
-
-DCore.thisRegion = function() { // No argument function || Вариант функции без аргументов
-    return $gameMap.regionId($gamePlayer.x, $gamePlayer.y);
-}
-
-DCore.membersInParty = function(ID) {
-    return $gameParty.members().some(actor => actor.actorId() === ID);
-};
-
-DCore.changeName = function(ID, length) {
-    SceneManager.push(Scene_Name);
-    SceneManager.prepareNextScene(ID, length);
-};
-
-DCore.getData = async function(fileName) { // For then usage || Для использования then
-    const fileUrl = "data/" + fileName + ".json";
-    const response = await fetch(fileUrl);
-    const text = await response.text();
-    return JSON.parse(text);
-}
-
-DCore.getDataSync = function(fileName) { // For no async usage (Not work in browser) || Для несинхронного использования (Не работает в браузере)
-    const file = require("fs");
-    const fileUrl = "data/" + fileName + ".json";
-    const text = file.readFileSync(fileUrl, "utf-8");
-    return JSON.parse(text);
-}
-
-//=============================================================================================
 // Dikarier_Core: Engine Enhancements | Улучшения движка
 //=============================================================================================
 
@@ -2336,16 +2611,6 @@ Game_Actor.prototype.changeEquip = function(slotId, item) {
     }
 }
 
-DCore.everyFrame = function(frame) {
-    const frames = Graphics.frameCount;
-    return frames % frame === 0;
-}
-
-DCore.everySecond = function(second) {
-    const frames = Graphics.frameCount;
-    return frames % (second * 60) === 0;
-}
-
 // For NW.js 0.107.0+ || Для NW.js 0.107.0+
 Bitmap.prototype._createCanvas = function(width, height) {
     this._canvas = document.createElement("canvas");
@@ -2355,7 +2620,139 @@ Bitmap.prototype._createCanvas = function(width, height) {
     this._createBaseTexture(this._canvas);
 };
 
-console.log(`${DCore.pluginName} v${DCore.pluginVersion} has been successfully loaded.`);
+AudioManager.playSs = function(sound) {
+    const buffer = AudioManager.createBuffer("ss", sound.name);
+    const audioConfig = {
+        volume: sound.volume !== undefined ? sound.volume : 100,
+        pitch: sound.pitch !== undefined ? sound.pitch : 100,
+        pan: sound.pan !== undefined ? sound.pan : 0
+    }
+    this.updateBufferParameters(buffer, this._seVolume, audioConfig);
+    buffer.play(false);
+    return buffer;
+}
+
+//=============================================================================================
+// Dikarier_Core: Backward Compatibility Patch (v1.5 -> v2.0) | Патч обратной совместимости
+//=============================================================================================
+
+/**
+ * @deprecated Use DCore.meta.pluginName instead. This property is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.meta.pluginName вместо этого. Данное свойство устарело и будет полностью удалено в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.pluginName = DCore.meta.pluginName;
+
+/**
+ * @deprecated Use DCore.meta.pluginVersion instead. This property is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.meta.pluginVersion вместо этого. Данное свойство устарело и будет полностью удалено в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.pluginVersion = DCore.meta.pluginVersion;
+
+/**
+ * @deprecated Use DCore.Utils.itemCount instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.itemCount вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.itemCount = function(id, action, count) {
+    return DCore.Utils.itemCount(id, action, count);
+};
+
+/**
+ * @deprecated Use DCore.Utils.weaponCount instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.weaponCount вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.weaponCount = function(id, action, count) {
+    return DCore.Utils.weaponCount(id, action, count);
+};
+
+/**
+ * @deprecated Use DCore.Utils.armorCount instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.armorCount вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.armorCount = function(id, action, count) {
+    return DCore.Utils.armorCount(id, action, count);
+};
+
+/**
+ * @deprecated Use DCore.Utils.random instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.random вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.random = function(min, max) {
+    return DCore.Utils.random(min, max);
+};
+
+/**
+ * @deprecated Use DCore.Utils.randFloat instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.randFloat вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.randFloat = function(min, max) {
+    return DCore.Utils.randFloat(min, max);
+};
+
+/**
+ * @deprecated Use DCore.Utils.randomProb instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.randomProb вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.persentRandom = function(percent) {
+    return DCore.Utils.randomProb(percent);
+};
+
+/**
+ * @deprecated Use DCore.Utils.thisRegion instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.thisRegion вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.thisRegion = function() {
+    return DCore.Utils.thisRegion();
+};
+
+/**
+ * @deprecated Use DCore.Utils.membersInParty instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.membersInParty вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.membersInParty = function(id) {
+    return DCore.Utils.membersInParty(id);
+};
+
+/**
+ * @deprecated Use DCore.Utils.changeName instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.changeName вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.changeName = function(id, length) {
+    return DCore.Utils.changeName(id, length);
+};
+
+/**
+ * @deprecated Use DCore.Utils.loadData instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.loadData вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.getData = function(fileName) {
+    return DCore.Utils.loadData(fileName);
+};
+
+/**
+ * @deprecated Use DCore.Utils.loadDataSync instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.loadDataSync вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.getDataSync = function(fileName) {
+    return DCore.Utils.loadDataSync(fileName);
+};
+
+/**
+ * @deprecated Use DCore.Utils.everyFrame instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.everyFrame вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.everyFrame = function(frame) {
+    return DCore.Utils.everyFrame(frame);
+};
+
+/**
+ * @deprecated Use DCore.Utils.everySecond instead. This method is obsolete and will be completely removed in future updates. Please avoid using this call in new code.
+ * | Используйте DCore.Utils.everySecond вместо этого. Данный метод устарел и будет полностью удален в будущих обновлениях. Пожалуйста, избегайте использования этого вызова в новом коде.
+ */
+DCore.everySecond = function(second) {
+    return DCore.Utils.everySecond(second);
+};
+
+console.log(`${DCore.meta.pluginName} v${DCore.meta.pluginVersion} has been successfully loaded.`);
 
 //=============================================================================================
 // Dikarier_Core: End
